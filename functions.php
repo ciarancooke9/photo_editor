@@ -29,20 +29,18 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
 ///this function will accept an image file location & parameters to reshape the file (width & height)
 function imageReshaper($image,$height, $width, $keepAspectRatio){
     ///get height and with Dimensions of original image
-    list($oldheight, $oldwidth) = getimagesize($image);
+    list($oldHeight, $oldWidth) = getimagesize($image);
     ///check for "keep aspect ratio" feature
     if ($keepAspectRatio == 'on' && $width != ''){
-        $height = keepAspectRatio($width, $height, $oldwidth, $oldheight);
+        $height = keepAspectRatio($width, $height, $oldWidth, $oldHeight);
     } elseif ($keepAspectRatio == 'on' && $height != ''){
-    $width = keepAspectRatio($width, $height, $oldwidth, $oldheight);
+    $width = keepAspectRatio($width, $height, $oldWidth, $oldHeight);
         }
-
-
-
+    ///reshape image and output it
     $source = imagecreatefromjpeg($image);
-    $dst = imagecreatetruecolor($width, $height);
-    imagecopyresized($dst, $source, 0, 0, 0, 0, $width, $height, $oldwidth, $oldheight);
-    return $dst;
+    $output = imagecreatetruecolor($width, $height);
+    imagecopyresized($output, $source, 0, 0, 0, 0, $width, $height, $oldWidth, $oldHeight);
+    return $output;
 }
 
 function photoEdit(){
@@ -68,28 +66,8 @@ $original = storeFiles($post_image,$post_image_temp, 'images/');
 echo $original;
 
 $reshapedImage = imageReshaper($original, $height, $width, $keepAspectRatio);
-$thumb = 'images/blabla' . $_FILES['image']['name'];
+$thumb = 'images/resized' . $_FILES['image']['name'];
 imagejpeg($reshapedImage, $thumb, 100);
-/*list($oldheight, $oldwidth) = getimagesize($original);
-
-if (isset($_POST['aspect'])){
-if (!$width == '')
-{
-$factor = (float)$width / (float)$oldwidth;
-$height = $factor * $oldheight;
-}
-else if (!$height == '')
-{
-$factor = (float)$height / (float)$oldheight;
-$width = $factor * $oldwidth;
-}
-}
-
-$newfile = imagecreatefromjpeg($original);
-$thumb = 'images/blabla' . $_FILES['image']['name'];
-$resized = imagecreatetruecolor($width, $height);
-imagecopyresampled($resized, $newfile, 0, 0, 0, 0, $width, $height, $oldwidth, $oldheight);
-imagejpeg($resized, $thumb, 100);*/
 
 unlink($original);
 echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='$thumb' height='$height' width='$width'/>";
