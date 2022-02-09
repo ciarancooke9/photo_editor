@@ -14,7 +14,7 @@ function cleanInput($data) {
 }
 
 //function will accept a file and check if it is a png or a jpeg, raising an error if it is not
-function checkFileIsImage($file){
+/*function checkFileIsImage($file){
     $fileName = $file;
     $error = '';
     $type = exif_imagetype( $fileName );
@@ -32,7 +32,7 @@ function checkFileIsImage($file){
             $error .= "Not an image" ;
     }
     return $error;
-}
+}*/
 
 /*function checkInputIsInteger($input){
 
@@ -79,6 +79,29 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
     }
 }
 
+//this function handles form fields being incorrectly filled out
+function emptyFieldHandling($width, $height, $keepAspectRatio, $file){
+    if (!$file){
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+        echo "<h2>File was not chosen</h2>";
+        return false;
+    } elseif ($width == '' && $height == ''){
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+        echo "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
+        return false;
+    } elseif ($width == '' && $keepAspectRatio == 'off') {
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+        echo "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
+        return false;
+    } elseif ($width == '' && $keepAspectRatio == 'off') {
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+        echo "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
+        return false;
+    } else {
+        return true;
+    }
+}
+
 ///this function will accept an image file location & parameters to reshape the file (width & height)
 function imageReshaper($image,$height, $width, $keepAspectRatio){
     ///get height and with Dimensions of original image
@@ -120,10 +143,9 @@ if (!$_POST) {
         $keepAspectRatio = 'off';
     }
 
-    //check file upload was not empty
-    if (!$_FILES['image']['name']){
-        echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
-        echo "<h2>File was not chosen</h2>";
+    //check fields and file upload was not empty or missing data
+    $fieldsNeeded = emptyFieldHandling($width, $height, $keepAspectRatio, $_FILES['image']['name']);
+    if(!$fieldsNeeded){
         return;
     }
 
