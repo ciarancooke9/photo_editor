@@ -1,5 +1,37 @@
 <?php
 
+function cleanInput($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+
+    ///Replace white spaces with +
+    $searchString = " ";
+    $replaceString = "";
+    $data = str_replace($searchString, $replaceString, $data);
+
+    return $data;
+}
+
+function checkInputIsInteger($input){
+
+    $int_value = ctype_digit($input) ? intval($input) : null;
+    if ($int_value === null)
+    {
+        // $value wasn't all numeric
+        return "<h2>for height and width enter numbers only!</h2>";
+    } else {
+        // else assign user input
+
+        if ($input < 0)
+        {
+        return  "<h2>Enter a positive numbers only!</h2>";
+        } else {
+            return $input;
+        }
+    }
+
+}
 
 ///this is a function to store a file
 function storeFiles($fileName,$tempFileName, $fileDir){
@@ -36,10 +68,13 @@ function imageReshaper($image,$height, $width, $keepAspectRatio){
     } elseif ($keepAspectRatio == 'on' && $height != ''){
     $width = keepAspectRatio($width, $height, $oldWidth, $oldHeight);
         }
-    ///reshape image and output it
+
+
+
     $source = imagecreatefromjpeg($image);
     $output = imagecreatetruecolor($width, $height);
     imagecopyresized($output, $source, 0, 0, 0, 0, $width, $height, $oldWidth, $oldHeight);
+    echo $width ."<br>". $height ."<br>". $oldWidth."<br>". $oldHeight;
     return $output;
 }
 
@@ -47,9 +82,15 @@ function photoEdit(){
 if (!$_POST) {
 echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' alt='...' />";
 } elseif ($_POST) {
+
 print_r($_POST);
 $width = $_POST['width'];
 $height = $_POST['height'];
+$height = cleanInput($height);
+$width = cleanInput($width);
+$width = checkInputIsInteger($width);
+$height = checkInputIsInteger($height);
+
 if (isset($_POST['aspect'])){
 $keepAspectRatio = 'on';
 } else {

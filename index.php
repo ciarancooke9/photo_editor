@@ -51,12 +51,12 @@
                 </div>
                 <div class="form-group">
                     <label for="width">Width</label>
-                    <input type="number" class="form-control" name="width" placeholder="300">
+                    <input type="number" maxlength="4" class="form-control" name="width" placeholder="300">
                     <small id="emailHelp" class="form-text text-muted">Enter the width you want your photo to be.</small>
                 </div>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Height</label>
-                    <input type="number" class="form-control" name="height" placeholder="300">
+                    <input type="number" maxlength="4" class="form-control" name="height" placeholder="300">
                     <small id="emailHelp" class="form-text text-muted">Enter the height you want your photo to be.</small>
                 </div>
                 <div class="form-check">
