@@ -12,6 +12,7 @@ function cleanInput($data) {
 
     return $data;
 }
+
 //function will accept a file and check if it is a png or a jpeg, raising an error if it is not
 function checkFileIsImage($file){
     $fileName = $file;
@@ -33,7 +34,7 @@ function checkFileIsImage($file){
     return $error;
 }
 
-function checkInputIsInteger($input){
+/*function checkInputIsInteger($input){
 
     $int_value = ctype_digit($input) ? intval($input) : null;
     if ($int_value === null)
@@ -50,7 +51,7 @@ function checkInputIsInteger($input){
             return $input;
         }
     }
-}
+}*/
 
 ///this is a function to store a file, accepts filename, temporary filename and the destination directory
 /// it then returns the file location
@@ -103,15 +104,15 @@ function imageReshaper($image,$height, $width, $keepAspectRatio){
 
 function photoEditJPEG(){
 if (!$_POST) {
-    echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' alt='...' />";
+    echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
 } elseif ($_POST) {
     $width = $_POST['width'];
     $height = $_POST['height'];
     //check valid input for height and width
     $height = cleanInput($height);
     $width = cleanInput($width);
-    $width = checkInputIsInteger($width);
-    $height = checkInputIsInteger($height);
+    //$width = checkInputIsInteger($width);
+    //$height = checkInputIsInteger($height);
 
     if (isset($_POST['aspect'])){
         $keepAspectRatio = 'on';
@@ -119,14 +120,22 @@ if (!$_POST) {
         $keepAspectRatio = 'off';
     }
 
+    //check file upload was not empty
+    if (!$_FILES['image']['name']){
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+        echo "<h2>File was not chosen</h2>";
+        return;
+    }
+
     $post_image = $_FILES['image']['name'];
     $post_image_temp = $_FILES['image']['tmp_name'];
     echo "<h1>$post_image</h1>";
     echo "<h2>Height:$height</h2>". ' ' . "<h2>Width:$width</h2>";
 
-    //store files
+    //store file
     $original = storeFiles($post_image,$post_image_temp, 'images/');
 
+    //reshape image
     $reshapedImage = imageReshaper($original, $height, $width, $keepAspectRatio);
 
     //check if file is image and then output error message or image depending on outcome
