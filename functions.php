@@ -99,7 +99,7 @@ function emptyFieldHandling($width, $height, $keepAspectRatio, $file){
         return false;
     } elseif ($width != '' && $height != '' && $keepAspectRatio == 'on') {
         echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
-        echo "<h2>If you want to keep aspect ratio you must only provide one of height or width, not both</h2>";
+        echo "<h2>If you want to keep aspect ratio you must only provide either height or width, not both</h2>";
         return false;
     } else {
         return true;
