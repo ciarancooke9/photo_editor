@@ -12,6 +12,26 @@ function cleanInput($data) {
 
     return $data;
 }
+//function will accept a file and check if it is a png or a jpeg, raising an error if it is not
+function checkFileIsImage($file){
+    $fileName = $file;
+    $error = '';
+    $type = exif_imagetype( $fileName );
+    switch( $type ) {
+        case 1:
+            $isImage = @imagecreatefromjpeg( $fileName );
+            $error .= ( !$isImage ) ? "extn - jpg, but not a valid jpg" : '  valid jpg';
+            return $error;
+        case 2:
+            echo "png : ";
+            $isImage = @imagecreatefrompng( $fileName );
+            $error .= ( !$isImage ) ? "extn - png, but not a valid png" : ' valid png';
+            return $error;
+        default: //if there is no exif data
+            $error .= "Not an image" ;
+    }
+    return $error;
+}
 
 function checkInputIsInteger($input){
 
@@ -30,10 +50,10 @@ function checkInputIsInteger($input){
             return $input;
         }
     }
-
 }
 
-///this is a function to store a file
+///this is a function to store a file, accepts filename, temporary filename and the destination directory
+/// it then returns the file location
 function storeFiles($fileName,$tempFileName, $fileDir){
     $fileLocation = $fileDir . $fileName;
 
@@ -69,50 +89,56 @@ function imageReshaper($image,$height, $width, $keepAspectRatio){
     $width = keepAspectRatio($width, $height, $oldWidth, $oldHeight);
         }
 
-
-
-    $source = imagecreatefromjpeg($image);
-    $output = imagecreatetruecolor($width, $height);
-    imagecopyresized($output, $source, 0, 0, 0, 0, $width, $height, $oldWidth, $oldHeight);
-    echo $width ."<br>". $height ."<br>". $oldWidth."<br>". $oldHeight;
-    return $output;
+    $source = @imagecreatefromjpeg($image);
+    //check if file is an image
+    if (!$source){
+        return "Error: This file is not an image";
+    } else {
+        $output = imagecreatetruecolor($width, $height);
+        imagecopyresized($output, $source, 0, 0, 0, 0, $width, $height, $oldWidth, $oldHeight);
+        echo $width ."<br>". $height ."<br>". $oldWidth."<br>". $oldHeight;
+        return $output;
+    }
 }
 
 function photoEdit(){
 if (!$_POST) {
-echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' alt='...' />";
+    echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' alt='...' />";
 } elseif ($_POST) {
+    $width = $_POST['width'];
+    $height = $_POST['height'];
+    //check valid input for height and width
+    $height = cleanInput($height);
+    $width = cleanInput($width);
+    $width = checkInputIsInteger($width);
+    $height = checkInputIsInteger($height);
 
-print_r($_POST);
-$width = $_POST['width'];
-$height = $_POST['height'];
-$height = cleanInput($height);
-$width = cleanInput($width);
-$width = checkInputIsInteger($width);
-$height = checkInputIsInteger($height);
+    if (isset($_POST['aspect'])){
+        $keepAspectRatio = 'on';
+    } else {
+        $keepAspectRatio = 'off';
+    }
 
-if (isset($_POST['aspect'])){
-$keepAspectRatio = 'on';
-} else {
-    $keepAspectRatio = 'off';
-}
-$post_image = $_FILES['image']['name'];
-$post_image_temp = $_FILES['image']['tmp_name'];
+    $post_image = $_FILES['image']['name'];
+    $post_image_temp = $_FILES['image']['tmp_name'];
+    echo "<h1>$post_image</h1>";
+    echo "<h2>Height:$height</h2>". ' ' . "<h2>Width:$width</h2>";
 
-echo "<h1>$post_image</h1>";
-echo "<h2>Height:$height</h2>". ' ' . "<h2>Width:$width</h2>";
+    //store files
+    $original = storeFiles($post_image,$post_image_temp, 'images/');
 
+    $reshapedImage = imageReshaper($original, $height, $width, $keepAspectRatio);
 
-$original = storeFiles($post_image,$post_image_temp, 'images/');
-echo $original;
+    //check if file is image and then output error message or image depending on outcome
+    if (is_string($reshapedImage)){
+        echo "<h2>{$reshapedImage}</h2>";
+    } else {
+        $thumb = 'images/resized' . $_FILES['image']['name'];
+        imagejpeg($reshapedImage, $thumb, 100);
 
-$reshapedImage = imageReshaper($original, $height, $width, $keepAspectRatio);
-$thumb = 'images/resized' . $_FILES['image']['name'];
-imagejpeg($reshapedImage, $thumb, 100);
-
-unlink($original);
-echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='$thumb' height='$height' width='$width'/>";
-///unlink($thumb);
-}
+        unlink($original);
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='$thumb' height='$height' width='$width'/>";
+        }
+    }
 }
 ?>
