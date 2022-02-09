@@ -33,7 +33,7 @@
 <div class="container px-4 px-lg-5">
     <!-- Heading Row-->
     <?php
-    photoEdit();
+    photoEditJPEG();
     ?>
     <!--<div class="col-lg-7">
         <br><br>

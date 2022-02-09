@@ -101,7 +101,7 @@ function imageReshaper($image,$height, $width, $keepAspectRatio){
     }
 }
 
-function photoEdit(){
+function photoEditJPEG(){
 if (!$_POST) {
     echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' alt='...' />";
 } elseif ($_POST) {
