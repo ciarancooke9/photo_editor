@@ -80,7 +80,7 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
 }
 
 //this function handles form fields being incorrectly filled out
-function emptyFieldHandling($width, $height, $keepAspectRatio, $file){
+function emptyFieldHandler($width, $height, $keepAspectRatio, $file){
     if (!$file){
         echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
         echo "<h2>File was not chosen</h2>";
@@ -147,9 +147,12 @@ if (!$_POST) {
         $keepAspectRatio = 'off';
     }
 
-    //check fields and file upload was not empty or missing data
-    $fieldsNeeded = emptyFieldHandling($width, $height, $keepAspectRatio, $_FILES['image']['name']);
+    //check fields and file upload was not empty or missing data or too large
+    $fieldsNeeded = emptyFieldHandler($width, $height, $keepAspectRatio, $_FILES['image']['name']);
     if(!$fieldsNeeded){
+        return;
+    } elseif ($_FILES['image']['size'] >= 2097152){
+        echo "File too large must be kept under 2MB";
         return;
     }
 
