@@ -127,11 +127,19 @@ function checkFileExtension($fileName){
     }
 }
 
+function resizeImage($image,$width,$height,$oldWidth, $oldHeight) {
+    $target_layer=imagecreatetruecolor($width,$height);
+    imagecopyresampled($target_layer,$image,0,0,0,0,$width,$height, $oldWidth,$oldHeight);
+    return $target_layer;
+}
+
+
 ///this function will accept an image file location & parameters to reshape the file (width & height)
 /// it also checks if the file is a genuine image, if it is not it returns an error message string
 function jpgReshaper($image,$height, $width, $keepAspectRatio){
-    ///get height and with Dimensions of original image
+    ///get height and width dimensions of original image
     list($oldHeight, $oldWidth) = getimagesize($image);
+
     ///check for "keep aspect ratio" feature
     if ($keepAspectRatio == 'on' && $width != ''){
         $height = keepAspectRatio($width, $height, $oldWidth, $oldHeight);
@@ -145,7 +153,8 @@ function jpgReshaper($image,$height, $width, $keepAspectRatio){
         return "Error: This file is not an image";
     } else {
         $output = imagecreatetruecolor($width, $height);
-        imagecopyresized($output, $source, 0, 0, 0, 0, $width, $height, $oldWidth, $oldHeight);
+        imagecopyresampled($output, $source, 0, 0, 0, 0, $width, $height, $oldWidth, $oldHeight);
+        //resizeImage($image,$width,$height,$oldWidth, $oldHeight);
         echo $width ."<br>". $height ."<br>". $oldWidth."<br>". $oldHeight;
 
         //check if file is image and then output error message or image depending on outcome
@@ -156,13 +165,13 @@ function jpgReshaper($image,$height, $width, $keepAspectRatio){
             imagejpeg($output, $thumb, 100);
 
             unlink($image);
-            echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='$thumb' height='$height' width='$width'/>";
+            echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='$thumb' />";
         }
 
     }
 }
 
-function photoEditJPEG(){
+function photoEdit(){
 if (!$_POST) {
     echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
 } elseif ($_POST) {
@@ -171,8 +180,6 @@ if (!$_POST) {
     //check valid input for height and width
     $height = cleanInput($height);
     $width = cleanInput($width);
-    //$width = checkInputIsInteger($width);
-    //$height = checkInputIsInteger($height);
 
     if (isset($_POST['aspect'])){
         $keepAspectRatio = 'on';
@@ -196,9 +203,11 @@ if (!$_POST) {
 
     //store file
     $original = storeFiles($post_image,$post_image_temp, 'images/');
-
+    imageHandler($original);
+    $newImageLocation = "resized" . $original;
+    echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='images/resized{$post_image}' alt='...' />";
     //check file extension
-    $fileExtension = checkFileExtension($original);
+    /*$fileExtension = checkFileExtension($original);
     if($fileExtension == 'jpg'){
         //reshape image
         jpgReshaper($original, $height, $width, $keepAspectRatio);
@@ -214,8 +223,35 @@ if (!$_POST) {
         //message if file is not jpg or png
         echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
         echo "<h1>Error: This filetype is not accepted, jpg or png files only.</h1>";
-    }
+    }*/
 
     }
+}
+
+function imageHandler($file)
+{
+        if (is_array($file)) {
+            $source_properties = getimagesize($file);
+            $image_type = $source_properties[2];
+            if ($image_type == IMAGETYPE_JPEG) {
+                $image_resource_id = imagecreatefromjpeg($file);
+                $target_layer = fn_resize($image_resource_id, $source_properties[0], $source_properties[1]);
+                $resizedImage = imagejpeg($target_layer, $_FILES['image']['name'] . "_thump.jpg");
+                return $resizedImage;
+            } elseif ($image_type == IMAGETYPE_PNG) {
+                $image_resource_id = imagecreatefrompng($file);
+                $target_layer = fn_resize($image_resource_id, $source_properties[0], $source_properties[1]);
+                $resizedImage = imagepng($target_layer, $_FILES['image']['name'] . "_thump.png");
+                return $resizedImage;
+            }
+        }
+}
+
+function fn_resize($image_resource_id,$width,$height) {
+    $target_width = $_POST['width'];
+    $target_height =$_POST['height'];
+    $target_layer=imagecreatetruecolor($target_width,$target_height);
+    imagecopyresampled($target_layer,$image_resource_id,0,0,0,0,$target_width,$target_height, $width,$height);
+    return $target_layer;
 }
 ?>

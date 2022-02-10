@@ -1,4 +1,6 @@
-<?php include "functions.php"; ?>
+<?php include "functions.php";
+//include "testFunctions.php";
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +35,7 @@
 <div class="container px-4 px-lg-5">
     <!-- Heading Row-->
     <?php
-    photoEditJPEG();
+    photoEdit();
     ?>
     <!--<div class="col-lg-7">
         <br><br>
