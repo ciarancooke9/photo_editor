@@ -168,7 +168,7 @@ if (!$_POST) {
     } else {
         $keepAspectRatio = 'off';
     }
-    echo $keepAspectRatio;
+
     //check fields and file upload was not empty or missing data or too large
     $fieldsNeeded = emptyFieldHandler($width, $height, $keepAspectRatio, $_FILES['image']['name']);
     if(!$fieldsNeeded){
@@ -210,7 +210,9 @@ if (!$_POST) {
     }
 
     else{
-        return "Error: This filetype is not accepted, jpg or png files only.";
+        //message if file is not jpg or png
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+        echo "<h1>Error: This filetype is not accepted, jpg or png files only.</h1>";
     }
 
     }
