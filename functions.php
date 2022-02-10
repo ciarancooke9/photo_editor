@@ -99,15 +99,37 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){
         return false;
     } elseif ($width != '' && $height != '' && $keepAspectRatio == 'on') {
         echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
-        echo "<h2>If you want to keep aspect ratio you must only provide either height or width, not both</h2>";
+        echo "<h2>If you want to keep aspect ratio you must provide either height or width, not both</h2>";
         return false;
     } else {
         return true;
     }
 }
 
+///function to check uploaded file extension, accepts a filename as a parameter
+function checkFileExtension($fileName){
+    $src_file_name = $fileName;
+
+    $ext = strtolower(pathinfo($src_file_name, PATHINFO_EXTENSION));
+
+    if ($ext == 'jpg' || $ext == 'jpeg')
+    {
+        return $ext;
+    }
+
+    elseif ($ext == 'png')
+    {
+        return $ext;
+    }
+
+    else {
+        return false;
+    }
+}
+
 ///this function will accept an image file location & parameters to reshape the file (width & height)
-function imageReshaper($image,$height, $width, $keepAspectRatio){
+/// it also checks if the file is a genuine image, if it is not it returns an error message string
+function jpgReshaper($image,$height, $width, $keepAspectRatio){
     ///get height and with Dimensions of original image
     list($oldHeight, $oldWidth) = getimagesize($image);
     ///check for "keep aspect ratio" feature
@@ -146,13 +168,13 @@ if (!$_POST) {
     } else {
         $keepAspectRatio = 'off';
     }
-
+    echo $keepAspectRatio;
     //check fields and file upload was not empty or missing data or too large
     $fieldsNeeded = emptyFieldHandler($width, $height, $keepAspectRatio, $_FILES['image']['name']);
     if(!$fieldsNeeded){
         return;
     } elseif ($_FILES['image']['size'] >= 2097152){
-        echo "File too large must be kept under 2MB";
+        echo "<h1>File too large must be kept under 2MB</h1>";
         return;
     }
 
@@ -164,19 +186,33 @@ if (!$_POST) {
     //store file
     $original = storeFiles($post_image,$post_image_temp, 'images/');
 
-    //reshape image
-    $reshapedImage = imageReshaper($original, $height, $width, $keepAspectRatio);
+    //check file extension
+    $fileExtension = checkFileExtension($original);
+    if($fileExtension == 'jpg'){
+        //reshape image
+        $reshapedImage = jpgReshaper($original, $height, $width, $keepAspectRatio);
 
-    //check if file is image and then output error message or image depending on outcome
-    if (is_string($reshapedImage)){
-        echo "<h2>{$reshapedImage}</h2>";
-    } else {
-        $thumb = 'images/resized' . $_FILES['image']['name'];
-        imagejpeg($reshapedImage, $thumb, 100);
+        //check if file is image and then output error message or image depending on outcome
+        if (is_string($reshapedImage)){
+            echo "<h2>{$reshapedImage}</h2>";
+        } else {
+            $thumb = 'images/resized' . $_FILES['image']['name'];
+            imagejpeg($reshapedImage, $thumb, 100);
 
-        unlink($original);
-        echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='$thumb' height='$height' width='$width'/>";
+            unlink($original);
+            echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='$thumb' height='$height' width='$width'/>";
         }
+    }
+
+    elseif ($fileExtension == 'png'){
+
+
+    }
+
+    else{
+        return "Error: This filetype is not accepted, jpg or png files only.";
+    }
+
     }
 }
 ?>
