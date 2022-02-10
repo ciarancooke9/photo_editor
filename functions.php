@@ -147,7 +147,18 @@ function jpgReshaper($image,$height, $width, $keepAspectRatio){
         $output = imagecreatetruecolor($width, $height);
         imagecopyresized($output, $source, 0, 0, 0, 0, $width, $height, $oldWidth, $oldHeight);
         echo $width ."<br>". $height ."<br>". $oldWidth."<br>". $oldHeight;
-        return $output;
+
+        //check if file is image and then output error message or image depending on outcome
+        if (is_string($output)){
+            echo "<h2>{$output}</h2>";
+        } else {
+            $thumb = 'images/resized' . $_FILES['image']['name'];
+            imagejpeg($output, $thumb, 100);
+
+            unlink($image);
+            echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='$thumb' height='$height' width='$width'/>";
+        }
+
     }
 }
 
@@ -190,18 +201,8 @@ if (!$_POST) {
     $fileExtension = checkFileExtension($original);
     if($fileExtension == 'jpg'){
         //reshape image
-        $reshapedImage = jpgReshaper($original, $height, $width, $keepAspectRatio);
+        jpgReshaper($original, $height, $width, $keepAspectRatio);
 
-        //check if file is image and then output error message or image depending on outcome
-        if (is_string($reshapedImage)){
-            echo "<h2>{$reshapedImage}</h2>";
-        } else {
-            $thumb = 'images/resized' . $_FILES['image']['name'];
-            imagejpeg($reshapedImage, $thumb, 100);
-
-            unlink($original);
-            echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='$thumb' height='$height' width='$width'/>";
-        }
     }
 
     elseif ($fileExtension == 'png'){
