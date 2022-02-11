@@ -174,20 +174,48 @@ function jpgReshaper($image,$height, $width, $keepAspectRatio){
 function imageHandler(){
     if($_POST) {
         if(is_array($_FILES)) {
+
+            if (isset($_POST['aspect'])){
+                $keepAspectRatio = 'on';
+            } else {
+                $keepAspectRatio = 'off';
+            }
+
+            //check fields and file upload was not empty or missing data or too large
+            $fieldsNeeded = emptyFieldHandler($_POST['width'], $_POST['height'], $keepAspectRatio, $_FILES['image']['name']);
+            if(!$fieldsNeeded){
+                return;
+            } elseif ($_FILES['image']['size'] >= 2097152){
+                echo "<h1>File too large must be kept under 2MB</h1>";
+                return;
+            }
+
+
+            //extract image from FILES array and width, height and file type
             $file = $_FILES['image']['tmp_name'];
             $source_properties = getimagesize($file);
+            if (!$source_properties){
+                echo "<h1>This file is not a genuine image</h1>";
+                return;
+            }
             $image_type = $source_properties[2];
             if( $image_type == IMAGETYPE_JPEG ) {
                 $image_resource_id = imagecreatefromjpeg($file);
-                $target_layer = fn_resize($image_resource_id,$source_properties[0],$source_properties[1]);
-                imagejpeg($target_layer,$_FILES['image']['name']);
+                $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1]);
+                imagejpeg($target_layer, $_FILES['image']['name']);
                 echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
+
             }
             elseif( $image_type == IMAGETYPE_PNG ) {
                 $image_resource_id = imagecreatefrompng($file);
-                $target_layer = fn_resize($image_resource_id,$source_properties[0],$source_properties[1]);
-                imagepng($target_layer,$_FILES['image']['name']);
-                echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
+                if (!$image_resource_id) {
+                    echo "<h1>Error: This file is not an image</h1>";
+                } else {
+
+                    $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1]);
+                    imagejpeg($target_layer, $_FILES['image']['name']);
+                    echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
+                }
             }
         }
     } else {
@@ -195,9 +223,14 @@ function imageHandler(){
     }
 }
 
-function fn_resize($image_resource_id,$width,$height) {
+function imageResize($image_resource_id,$width,$height) {
     $targetWidth = $_POST['width'];
     $targetHeight = $_POST['height'];
+    // clean input
+    $targetHeight = cleanInput($targetHeight);
+    $targetWidth = cleanInput($targetWidth);
+
+    //create resized image and paint old image over it
     $target_layer=imagecreatetruecolor($targetWidth,$targetHeight);
     imagecopyresampled($target_layer,$image_resource_id,0,0,0,0,$targetWidth,$targetHeight, $width,$height);
     return $target_layer;
