@@ -90,9 +90,8 @@ function checkFileExtension($fileName){
 // this file checks the inputs from the reshaped image form and gives back the reshaped image
 function imageHandler(){
     if($_POST) {
-        print_r($_POST);
-        echo "<h1>{$_FILES['image']['name']}</h1>";
 
+        echo "<h1>{$_FILES['image']['name']}</h1>";
 
         if(is_array($_FILES)) {
             // check for keep aspect ratio and image quality inputs
