@@ -90,7 +90,7 @@ function checkFileExtension($fileName){
 // this file checks the inputs from the reshaped image form and gives back the reshaped image
 function imageHandler(){
     if($_POST) {
-
+        print_r($_POST);
         echo "<h1>{$_FILES['image']['name']}</h1>";
 
 
@@ -132,18 +132,24 @@ function imageHandler(){
             //Branch for JPG images
             if( $image_type == IMAGETYPE_JPEG ) {
                 $image_resource_id = imagecreatefromjpeg($file);
-                $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
-                imagejpeg($target_layer,'images/'.$_FILES['image']['name'],$imageQuality);
+                $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1], $keepAspectRatio);
+                if (isset($_POST['watermark'])) {
+                    $target_layer = watermarkImage($target_layer);
+                }
+                imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality);
                 echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
-
             }
             // Branch for PNG images
             elseif( $image_type == IMAGETYPE_PNG ) {
                 $image_resource_id = imagecreatefrompng($file);
                 $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
+                if (isset($_POST['watermark'])) {
+                    $target_layer = watermarkImage($target_layer);
+                }
                 imagejpeg($target_layer, $_FILES['image']['name'],$imageQuality);
                 echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
                 }
+
             else{
                 echo "<h1>Please upload only jpeg or png files</h1>";
             }
@@ -175,5 +181,15 @@ function imageResize($image_resource_id,$width,$height,$keepAspectRatio) {
     $target_layer=imagecreatetruecolor($targetWidth,$targetHeight);
     imagecopyresampled($target_layer,$image_resource_id,0,0,0,0,$targetWidth,$targetHeight, $width,$height);
     return $target_layer;
+}
+//this function will add a watermark to the image
+function watermarkImage($image){
+    $text = $_POST['watermark'];
+    $font = "C:\Windows\Fonts\arial.ttf"; //select font
+
+    $fontcolor = imagecolorallocatealpha($image, 255, 0, 0, 75); //select color
+    imagettftext($image, 18, 0,0, 24, $fontcolor, $font, $text); //choose watermark position
+
+    return $image;
 }
 ?>

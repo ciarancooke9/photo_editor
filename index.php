@@ -64,6 +64,11 @@
                     <input type="number" min="1" max="100" class="form-control" name="imageQuality" placeholder="100">
                     <small id="emailHelp" class="form-text text-muted">Quality (between 1 and 100)</small>
                 </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Watermark</label>
+                    <input type="text" class="form-control" name="watermark" placeholder="Copyrighted">
+                    <small id="emailHelp" class="form-text text-muted">Add a watermark to the image(optional)</small>
+                </div>
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" name="aspect">
                     <label class="form-check-label" for="aspect">Keep aspect ratio</label>
