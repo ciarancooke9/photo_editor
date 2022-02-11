@@ -23,15 +23,15 @@ function storeFiles($fileName,$tempFileName, $fileDir){
     return $fileLocation;
 }
 
-///Function to maintain aspect ratio of an image
+///Function to maintain aspect ratio of an image, accepts target height and width and the original image height and width as paramaters
 function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
-    if (!$width == '')
+    if (!$width == '')        //height missing
     {
         $factor = (float)$width / (float)$oldWidth;
         $height = $factor * $oldHeight;
         return $height;
     }
-    else if (!$height == '')
+    else if (!$height == '')      //width missing
     {
         $factor = (float)$height / (float)$oldHeight;
         $width = $factor * $oldWidth;
@@ -74,12 +74,12 @@ function checkFileExtension($fileName){
 
     if ($ext == 'jpg' || $ext == 'jpeg')
     {
-        return $ext;
+        return true;
     }
 
     elseif ($ext == 'png')
     {
-        return $ext;
+        return true;
     }
 
     else {
@@ -95,11 +95,17 @@ function imageHandler(){
 
 
         if(is_array($_FILES)) {
-
+            // check for keep aspect ratio and image quality inputs
             if (isset($_POST['aspect'])){
                 $keepAspectRatio = 'on';
             } else {
                 $keepAspectRatio = 'off';
+            }
+
+            if (isset($_POST['imageQuality'])){
+                $imageQuality = $_POST['imageQuality'];
+            } else {
+                $imageQuality = 100;
             }
 
             //check fields and file upload was not empty or missing data or too large
@@ -127,7 +133,7 @@ function imageHandler(){
             if( $image_type == IMAGETYPE_JPEG ) {
                 $image_resource_id = imagecreatefromjpeg($file);
                 $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
-                imagejpeg($target_layer,'images/'.$_FILES['image']['name']);
+                imagejpeg($target_layer,'images/'.$_FILES['image']['name'],$imageQuality);
                 echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
 
             }
@@ -135,7 +141,7 @@ function imageHandler(){
             elseif( $image_type == IMAGETYPE_PNG ) {
                 $image_resource_id = imagecreatefrompng($file);
                 $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
-                imagejpeg($target_layer, $_FILES['image']['name']);
+                imagejpeg($target_layer, $_FILES['image']['name'],$imageQuality);
                 echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
                 }
             else{
