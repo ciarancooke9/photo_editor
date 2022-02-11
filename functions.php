@@ -90,6 +90,10 @@ function checkFileExtension($fileName){
 // this file checks the inputs from the reshaped image form and gives back the reshaped image
 function imageHandler(){
     if($_POST) {
+
+        echo "<h1>{$_FILES['image']['name']}</h1>";
+
+
         if(is_array($_FILES)) {
 
             if (isset($_POST['aspect'])){
@@ -123,8 +127,8 @@ function imageHandler(){
             if( $image_type == IMAGETYPE_JPEG ) {
                 $image_resource_id = imagecreatefromjpeg($file);
                 $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
-                imagejpeg($target_layer, $_FILES['image']['name']);
-                echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
+                imagejpeg($target_layer,'images/'.$_FILES['image']['name']);
+                echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
 
             }
             // Branch for PNG images
@@ -151,6 +155,8 @@ function imageResize($image_resource_id,$width,$height,$keepAspectRatio) {
     // clean input
     $targetHeight = cleanInput($targetHeight);
     $targetWidth = cleanInput($targetWidth);
+
+    echo "<h2>Height:$targetHeight</h2>". ' ' . "<h2>Width:$targetWidth</h2>";
 
     //perform keep aspect ratio function if selceted
     if ($keepAspectRatio == 'on' && $targetWidth != ''){
