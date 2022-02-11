@@ -180,21 +180,18 @@ function imageHandler(){
             if( $image_type == IMAGETYPE_JPEG ) {
                 $image_resource_id = imagecreatefromjpeg($file);
                 $target_layer = fn_resize($image_resource_id,$source_properties[0],$source_properties[1]);
-                imagejpeg($target_layer,$_FILES['image']['name'] . "_thump.jpg");
-            }
-            elseif( $image_type == IMAGETYPE_GIF )  {
-                $image_resource_id = imagecreatefromgif($file);
-                $target_layer = fn_resize($image_resource_id,$source_properties[0],$source_properties[1]);
-                imagegif($target_layer,$_FILES['image']['name'] . "_thump.gif");
+                imagejpeg($target_layer,$_FILES['image']['name']);
+                echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
             }
             elseif( $image_type == IMAGETYPE_PNG ) {
                 $image_resource_id = imagecreatefrompng($file);
                 $target_layer = fn_resize($image_resource_id,$source_properties[0],$source_properties[1]);
-                imagepng($target_layer,$_FILES['image']['name'] . "_thump.png");
+                imagepng($target_layer,$_FILES['image']['name']);
+                echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
             }
         }
     } else {
-        echo "post submit fail";
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
     }
 }
 
