@@ -13,46 +13,6 @@ function cleanInput($data) {
     return $data;
 }
 
-//function will accept a file and check if it is a png or a jpeg, raising an error if it is not
-/*function checkFileIsImage($file){
-    $fileName = $file;
-    $error = '';
-    $type = exif_imagetype( $fileName );
-    switch( $type ) {
-        case 1:
-            $isImage = @imagecreatefromjpeg( $fileName );
-            $error .= ( !$isImage ) ? "extn - jpg, but not a valid jpg" : '  valid jpg';
-            return $error;
-        case 2:
-            echo "png : ";
-            $isImage = @imagecreatefrompng( $fileName );
-            $error .= ( !$isImage ) ? "extn - png, but not a valid png" : ' valid png';
-            return $error;
-        default: //if there is no exif data
-            $error .= "Not an image" ;
-    }
-    return $error;
-}*/
-
-/*function checkInputIsInteger($input){
-
-    $int_value = ctype_digit($input) ? intval($input) : null;
-    if ($int_value === null)
-    {
-        // $value wasn't all numeric
-        return "<h2>for height and width enter numbers only!</h2>";
-    } else {
-        // else assign user input
-
-        if ($input < 0)
-        {
-        return  "<h2>Enter a positive numbers only!</h2>";
-        } else {
-            return $input;
-        }
-    }
-}*/
-
 ///this is a function to store a file, accepts filename, temporary filename and the destination directory
 /// it then returns the file location
 function storeFiles($fileName,$tempFileName, $fileDir){
@@ -127,50 +87,7 @@ function checkFileExtension($fileName){
     }
 }
 
-function resizeImage($image,$width,$height,$oldWidth, $oldHeight) {
-    $target_layer=imagecreatetruecolor($width,$height);
-    imagecopyresampled($target_layer,$image,0,0,0,0,$width,$height, $oldWidth,$oldHeight);
-    return $target_layer;
-}
-
-
-///this function will accept an image file location & parameters to reshape the file (width & height)
-/// it also checks if the file is a genuine image, if it is not it returns an error message string
-function jpgReshaper($image,$height, $width, $keepAspectRatio){
-    ///get height and width dimensions of original image
-    list($oldHeight, $oldWidth) = getimagesize($image);
-
-    ///check for "keep aspect ratio" feature
-    if ($keepAspectRatio == 'on' && $width != ''){
-        $height = keepAspectRatio($width, $height, $oldWidth, $oldHeight);
-    } elseif ($keepAspectRatio == 'on' && $height != ''){
-    $width = keepAspectRatio($width, $height, $oldWidth, $oldHeight);
-        }
-
-    $source = @imagecreatefromjpeg($image);
-    //check if file is an image
-    if (!$source){
-        return "Error: This file is not an image";
-    } else {
-        $output = imagecreatetruecolor($width, $height);
-        imagecopyresampled($output, $source, 0, 0, 0, 0, $width, $height, $oldWidth, $oldHeight);
-        //resizeImage($image,$width,$height,$oldWidth, $oldHeight);
-        echo $width ."<br>". $height ."<br>". $oldWidth."<br>". $oldHeight;
-
-        //check if file is image and then output error message or image depending on outcome
-        if (is_string($output)){
-            echo "<h2>{$output}</h2>";
-        } else {
-            $thumb = 'images/resized' . $_FILES['image']['name'];
-            imagejpeg($output, $thumb, 100);
-
-            //unlink($image);
-            echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='$thumb' />";
-        }
-
-    }
-}
-
+// this file checks the inputs from the reshaped image form and gives back the reshaped image
 function imageHandler(){
     if($_POST) {
         if(is_array($_FILES)) {
@@ -194,28 +111,31 @@ function imageHandler(){
             //extract image from FILES array and width, height and file type
             $file = $_FILES['image']['tmp_name'];
             $source_properties = getimagesize($file);
+
+            //check is file genuine image
             if (!$source_properties){
                 echo "<h1>This file is not a genuine image</h1>";
                 return;
             }
             $image_type = $source_properties[2];
+
+            //Branch for JPG images
             if( $image_type == IMAGETYPE_JPEG ) {
                 $image_resource_id = imagecreatefromjpeg($file);
-                $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1]);
+                $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
                 imagejpeg($target_layer, $_FILES['image']['name']);
                 echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
 
             }
+            // Branch for PNG images
             elseif( $image_type == IMAGETYPE_PNG ) {
                 $image_resource_id = imagecreatefrompng($file);
-                if (!$image_resource_id) {
-                    echo "<h1>Error: This file is not an image</h1>";
-                } else {
-
-                    $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1]);
-                    imagejpeg($target_layer, $_FILES['image']['name']);
-                    echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
+                $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
+                imagejpeg($target_layer, $_FILES['image']['name']);
+                echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
                 }
+            else{
+                echo "<h1>Please upload only jpeg or png files</h1>";
             }
         }
     } else {
@@ -223,12 +143,21 @@ function imageHandler(){
     }
 }
 
-function imageResize($image_resource_id,$width,$height) {
+//This function is passed the original image, its width and height and the keep aspect ratio option and gives back the resized image
+function imageResize($image_resource_id,$width,$height,$keepAspectRatio) {
     $targetWidth = $_POST['width'];
     $targetHeight = $_POST['height'];
+
     // clean input
     $targetHeight = cleanInput($targetHeight);
     $targetWidth = cleanInput($targetWidth);
+
+    //perform keep aspect ratio function if selceted
+    if ($keepAspectRatio == 'on' && $targetWidth != ''){
+        $targetHeight = keepAspectRatio($targetWidth, $targetHeight, $width, $height);
+    } elseif ($keepAspectRatio == 'on' && $targetHeight != ''){
+        $targetWidth = keepAspectRatio($targetWidth, $targetHeight, $width, $height);
+    }
 
     //create resized image and paint old image over it
     $target_layer=imagecreatetruecolor($targetWidth,$targetHeight);
