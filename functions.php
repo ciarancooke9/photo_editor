@@ -43,19 +43,19 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
 function emptyFieldHandler($width, $height, $keepAspectRatio, $file){
     $replacementImage = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
     $errorMessage = "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
-    if (!$file){
+    if (!$file){ //No file uploaded
         echo $replacementImage;
         echo "<h2>File was not chosen</h2>";
         return false;
-    } elseif ($width == '' && $height == ''){
+    } elseif ($width == '' && $height == ''){ //image & height missing
         echo $replacementImage;
         echo $errorMessage;
         return false;
-    } elseif ($width == '' && $keepAspectRatio == 'off') {
+    } elseif ($width == '' && $keepAspectRatio == 'off') { //width missing without keep aspect ratio checked
         echo $replacementImage;
         echo $errorMessage;
         return false;
-    } elseif ($width == '' && $keepAspectRatio == 'off') {
+    } elseif ($height == '' && $keepAspectRatio == 'off') { //height missing without keep aspect ratio checked
         echo $replacementImage;
         echo $errorMessage;
         return false;
