@@ -186,6 +186,7 @@ function imageResize($image_resource_id,$width,$height,$keepAspectRatio) {
 //this function will add a watermark to the image
 function watermarkImage($image){
     $text = $_POST['watermark'];
+    $text = cleanInput($text);
     $font = "C:\Windows\Fonts\arial.ttf"; //select font
 
     $fontcolor = imagecolorallocatealpha($image, 255, 0, 0, 75); //select color
