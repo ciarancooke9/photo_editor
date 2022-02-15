@@ -59,7 +59,7 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){
         echo $replacementImage;
         echo $errorMessage;
         return false;
-    } elseif ($width != '' && $height != '' && $keepAspectRatio == 'on') {
+    } elseif ($width != '' && $height != '' && $keepAspectRatio == 'on') { //both height & width missing but aspect ration checked
         echo $replacementImage;
         echo "<h2>If you want to keep aspect ratio you must provide either height or width, not both</h2>";
         return false;
