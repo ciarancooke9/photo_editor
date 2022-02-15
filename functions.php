@@ -5,11 +5,6 @@ function cleanInput($data) {
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
 
-    ///Replace white spaces with +
-    $searchString = " ";
-    $replaceString = "";
-    $data = str_replace($searchString, $replaceString, $data);
-
     return $data;
 }
 
