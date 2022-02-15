@@ -42,21 +42,22 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
 //this function handles form fields being incorrectly filled out
 function emptyFieldHandler($width, $height, $keepAspectRatio, $file){
     $replacementImage = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+    $errorMessage = "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
     if (!$file){
         echo $replacementImage;
         echo "<h2>File was not chosen</h2>";
         return false;
     } elseif ($width == '' && $height == ''){
         echo $replacementImage;
-        echo "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
+        echo $errorMessage;
         return false;
     } elseif ($width == '' && $keepAspectRatio == 'off') {
         echo $replacementImage;
-        echo "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
+        echo $errorMessage;
         return false;
     } elseif ($width == '' && $keepAspectRatio == 'off') {
         echo $replacementImage;
-        echo "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
+        echo $errorMessage;
         return false;
     } elseif ($width != '' && $height != '' && $keepAspectRatio == 'on') {
         echo $replacementImage;
