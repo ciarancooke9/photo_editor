@@ -64,11 +64,31 @@
                     <input type="number" min="1" max="100" class="form-control" name="imageQuality" placeholder="100">
                     <small id="emailHelp" class="form-text text-muted">Quality (between 1 and 100)</small>
                 </div>
-                <div class="form-group">
+                <div class="form-group" >
                     <label for="exampleInputEmail1">Watermark</label>
                     <input type="text" class="form-control" name="watermark" placeholder="Copyrighted">
                     <small id="emailHelp" class="form-text text-muted">Add a watermark to the image(optional)</small>
                 </div>
+                <p>
+                    <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                        More watermark options
+                    </button>
+                </p>
+                <div class="collapse" id="collapseExample">
+                    <div class="card-body">
+                    <div class="form-group" >
+                        <label for="exampleInputEmail1">Color</label>
+                        <input type="text" class="form-control" name="color" placeholder="Watermark Color">
+                        <small id="emailHelp" class="form-text text-muted">Select watermark color(default is red)</small>
+                    </div>
+                    <div class="form-group" >
+                        <label for="exampleInputEmail1">Position</label>
+                        <input type="text" class="form-control" name="position" placeholder="Watermark Position">
+                        <small id="emailHelp" class="form-text text-muted">Chose the position of your watermark(default is top left)</small>
+                    </div>
+                    </div>
+                </div>
+
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" name="aspect">
                     <label class="form-check-label" for="aspect">Keep aspect ratio</label>
@@ -77,5 +97,6 @@
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
 
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
         </div>
     </div>
