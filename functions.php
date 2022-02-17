@@ -86,6 +86,7 @@ function checkFileExtension($fileName){
 
 // this file checks the inputs from the reshaped image form and gives back the reshaped image
 function imageHandler(){
+    echo $_POST['color'];
     if($_POST) {
 
         echo "<h1>{$_FILES['image']['name']}</h1>";
@@ -98,7 +99,7 @@ function imageHandler(){
                 $keepAspectRatio = 'off';
             }
             //check for image quality parameter, keep 100% photo quality if not found
-            if (isset($_POST['imageQuality'])){
+            if (isset($_POST['imageQuality']) && ($_POST['imageQuality'] != '')){
                 $imageQuality = $_POST['imageQuality'];
             } else {
                 $imageQuality = 100;
