@@ -185,18 +185,22 @@ function watermarkImage($image){
     $text = cleanInput($text);
     $font = "C:\Windows\Fonts\arial.ttf"; //select font
 
+    //assign watermark color
     $fontcolor = hexColorAllocate($image, $_POST['color']);
+
+
     imagettftext($image, 18, 0,0, 24, $fontcolor, $font, $text); //choose watermark position
 
     return $image;
 }
 
-//function to convert hex color to rgb
+//function to convert hex color to rgb, accepts image and hex code from form input,
+//Returns a color identifier representing the color composed of the given RGB components.
 function hexColorAllocate($im,$hex){
     $hex = ltrim($hex,'#');
     $r = hexdec(substr($hex,0,2));
     $g = hexdec(substr($hex,2,2));
     $b = hexdec(substr($hex,4,2));
-    return imagecolorallocate($im, $r, $g, $b);
+    return imagecolorallocatealpha($im, $r, $g, $b, 75);
 }
 ?>
