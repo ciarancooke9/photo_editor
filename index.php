@@ -77,7 +77,7 @@
                 <div class="collapse" id="collapseExample">
                     <div class="card-body">
                     <div class="form-group" >
-                        <label for="favcolor">Select your favorite color:</label>
+                        <label for="favcolor">Select watermark color:</label>
                         <input type="color" id="color" name="color" value="#ff0000">
                         <small id="emailHelp" class="form-text text-muted">Select watermark color(default is red)</small>
                     </div>

@@ -86,7 +86,7 @@ function checkFileExtension($fileName){
 
 // this file checks the inputs from the reshaped image form and gives back the reshaped image
 function imageHandler(){
-    echo $_POST['color'];
+    print_r($_POST);
     if($_POST) {
 
         echo "<h1>{$_FILES['image']['name']}</h1>";
@@ -185,9 +185,18 @@ function watermarkImage($image){
     $text = cleanInput($text);
     $font = "C:\Windows\Fonts\arial.ttf"; //select font
 
-    $fontcolor = imagecolorallocatealpha($image, 255, 0, 0, 75); //select color
+    $fontcolor = hexColorAllocate($image, $_POST['color']);
     imagettftext($image, 18, 0,0, 24, $fontcolor, $font, $text); //choose watermark position
 
     return $image;
+}
+
+//function to convert hex color to rgb
+function hexColorAllocate($im,$hex){
+    $hex = ltrim($hex,'#');
+    $r = hexdec(substr($hex,0,2));
+    $g = hexdec(substr($hex,2,2));
+    $b = hexdec(substr($hex,4,2));
+    return imagecolorallocate($im, $r, $g, $b);
 }
 ?>
