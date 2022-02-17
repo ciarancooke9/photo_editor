@@ -189,10 +189,12 @@ function watermarkImage($image){
     $fontcolor = hexColorAllocate($image, $_POST['color']);
 
 
-    imagettftext($image, 18, 0,0, 24, $fontcolor, $font, $text); //choose watermark position
+    imagettftext($image, 28, 0,180, 54, $fontcolor, $font, $text); //choose watermark position
 
     return $image;
 }
+
+//this function will accept and option from form data and position the watermark accordanly
 
 //function to convert hex color to rgb, accepts image and hex code from form input,
 //Returns a color identifier representing the color composed of the given RGB components.
