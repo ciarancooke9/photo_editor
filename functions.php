@@ -205,16 +205,26 @@ function watermarkPositionAndSize($targetWidth, $targetHeight, $position){
             $sizeAndPositionArray = array($size, 0, 28, 54);
             break;
         case "topRight":
-            $firstLetterPosition = $targetWidth - ($size * 7);
+            $firstLetterPosition = $targetWidth - ($size * 7); //to keep watermark within borders of image
             $sizeAndPositionArray = array($size, 0, $firstLetterPosition, 54);
             break;
         case "bottomLeft":
-            $watermarkHeight = $targetHeight - ($size);
+            $watermarkHeight = $targetHeight - ($size); //to keep watermark within borders of image
             $sizeAndPositionArray = array($size, 0, 28, $watermarkHeight);
             break;
         case "bottomRight":
             $firstLetterPosition = $targetWidth - ($size * 7);
             $watermarkHeight = $targetHeight - ($size);
+            $sizeAndPositionArray = array($size, 0, $firstLetterPosition, $watermarkHeight);
+            break;
+        case "centreDiagonal":
+            $firstLetterPosition = $targetWidth / 2;
+            $watermarkHeight = $targetHeight / 2;
+            $sizeAndPositionArray = array($size, 315, $firstLetterPosition, $watermarkHeight);
+            break;
+        case "centreStraight":
+            $firstLetterPosition = $targetWidth / 2;
+            $watermarkHeight = $targetHeight / 2;
             $sizeAndPositionArray = array($size, 0, $firstLetterPosition, $watermarkHeight);
             break;
     }

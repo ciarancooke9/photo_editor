@@ -87,9 +87,9 @@
                             <option value="topLeft">Top Left</option>
                             <option value="topRight">Top Right</option>
                             <option value="bottomLeft">Bottom Left</option>
-                            <option value="bottomRight">bottomRight</option>
+                            <option value="bottomRight">Bottom Right</option>
                             <option value="centreStraight">Across Centre</option>
-                            <option value="centerDiagonal">Centre Diagonal</option>
+                            <option value="centreDiagonal">Centre Diagonal</option>
                         </select>
                         <small id="emailHelp" class="form-text text-muted">Chose the position of your watermark(default is top left)</small>
                     </div>
