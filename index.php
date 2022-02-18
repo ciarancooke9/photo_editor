@@ -87,7 +87,7 @@
                             <option value="topLeft">Top Left</option>
                             <option value="topRight">Top Right</option>
                             <option value="bottomLeft">Bottom Left</option>
-                            <option value="bottomRight">Top Left</option>
+                            <option value="bottomRight">bottomRight</option>
                             <option value="centreStraight">Across Centre</option>
                             <option value="centerDiagonal">Centre Diagonal</option>
                         </select>

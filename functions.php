@@ -211,6 +211,12 @@ function watermarkPositionAndSize($targetWidth, $targetHeight, $position){
         case "bottomLeft":
             $watermarkHeight = $targetHeight - ($size);
             $sizeAndPositionArray = array($size, 0, 28, $watermarkHeight);
+            break;
+        case "bottomRight":
+            $firstLetterPosition = $targetWidth - ($size * 7);
+            $watermarkHeight = $targetHeight - ($size);
+            $sizeAndPositionArray = array($size, 0, $firstLetterPosition, $watermarkHeight);
+            break;
     }
     return $sizeAndPositionArray;
 }
