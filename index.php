@@ -83,7 +83,14 @@
                     </div>
                     <div class="form-group" >
                         <label for="exampleInputEmail1">Position</label>
-                        <input type="text" class="form-control" name="position" placeholder="Watermark Position">
+                        <select name="position">
+                            <option value="topLeft">Top Left</option>
+                            <option value="topRight">Top Right</option>
+                            <option value="bottomLeft">Bottom Left</option>
+                            <option value="bottomRight">Top Left</option>
+                            <option value="centreStraight">Across Centre</option>
+                            <option value="centerDiagonal">Centre Diagonal</option>
+                        </select>
                         <small id="emailHelp" class="form-text text-muted">Chose the position of your watermark(default is top left)</small>
                     </div>
                     </div>

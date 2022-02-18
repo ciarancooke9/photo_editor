@@ -207,4 +207,4 @@ function hexColorAllocate($image,$hex){
     $b = hexdec(substr($hex,4,2));
     return imagecolorallocatealpha($image, $r, $g, $b, 75);
 }
-?>
+?>3
