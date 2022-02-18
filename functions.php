@@ -186,16 +186,30 @@ function watermarkImage($image){
     $font = "C:\Windows\Fonts\arial.ttf"; //select font
 
     //assign watermark color
-    $fontcolor = hexColorAllocate($image, $_POST['color']);
+    $fontColor = hexColorAllocate($image, $_POST['color']);
 
-    imagettftext($image, 28, 0,180, 54, $fontcolor, $font, $text); //choose watermark position
+    //assign watermark position
+    $sizeAndPositionArray = watermarkPositionAndSize($_FILES['image']['tmp_name'],$_POST['position']);
+    imagettftext($image, $sizeAndPositionArray[0], $sizeAndPositionArray[1],$sizeAndPositionArray[2], $sizeAndPositionArray[3], $fontColor, $font, $text); //choose watermark position
 
     return $image;
 }
 
-//this function will accept and option from form data and position the watermark
-function watermarkPositionAndSize(){
+//this function will accept an image and an option from form data and return an array with the size,angle, x coordinate, y coordinate
+function watermarkPositionAndSize($image, $position){
 
+    $imageProperties = getimagesize($image); //first array element = width, second = height
+
+    //switch statement to handle different options
+    switch ($position){
+        case "topLeft":
+            $sizeAndPositionArray = array(28, 0, 28, 54);
+            break;
+        case "topRight":
+            $sizeAndPositionArray = array(28, 0, 280, 54);
+            break;
+    }
+    return $sizeAndPositionArray;
 }
 
 //function to convert hex color to rgb, accepts image and hex code from form input,
@@ -207,4 +221,4 @@ function hexColorAllocate($image,$hex){
     $b = hexdec(substr($hex,4,2));
     return imagecolorallocatealpha($image, $r, $g, $b, 75);
 }
-?>3
+?>
