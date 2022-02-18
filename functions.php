@@ -189,16 +189,14 @@ function watermarkImage($image){
     $fontColor = hexColorAllocate($image, $_POST['color']);
 
     //assign watermark position
-    $sizeAndPositionArray = watermarkPositionAndSize($_FILES['image']['tmp_name'],$_POST['position']);
+    $sizeAndPositionArray = watermarkPositionAndSize($_POST['width'], $_POST['height'], $_POST['position']);
     imagettftext($image, $sizeAndPositionArray[0], $sizeAndPositionArray[1],$sizeAndPositionArray[2], $sizeAndPositionArray[3], $fontColor, $font, $text); //choose watermark position
 
     return $image;
 }
 
 //this function will accept an image and an option from form data and return an array with the size,angle, x coordinate, y coordinate
-function watermarkPositionAndSize($image, $position){
-
-    $imageProperties = getimagesize($image); //first array element = width, second = height
+function watermarkPositionAndSize($targetWidth, $targetHeight, $position){
 
     //switch statement to handle different options
     switch ($position){
@@ -206,7 +204,9 @@ function watermarkPositionAndSize($image, $position){
             $sizeAndPositionArray = array(28, 0, 28, 54);
             break;
         case "topRight":
-            $sizeAndPositionArray = array(28, 0, 280, 54);
+            $size = $targetWidth / 50;
+            $firstLetterPosition = $targetWidth - ($size * 7);
+            $sizeAndPositionArray = array($size, 0, $firstLetterPosition, 54);
             break;
     }
     return $sizeAndPositionArray;
