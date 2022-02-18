@@ -199,15 +199,18 @@ function watermarkImage($image){
 function watermarkPositionAndSize($targetWidth, $targetHeight, $position){
 
     //switch statement to handle different options
+    $size = ($targetWidth + $targetHeight) / 100; //statement to keep image size consistent with different image sizes and shapes
     switch ($position){
         case "topLeft":
-            $sizeAndPositionArray = array(28, 0, 28, 54);
+            $sizeAndPositionArray = array($size, 0, 28, 54);
             break;
         case "topRight":
-            $size = $targetWidth / 50;
             $firstLetterPosition = $targetWidth - ($size * 7);
             $sizeAndPositionArray = array($size, 0, $firstLetterPosition, 54);
             break;
+        case "bottomLeft":
+            $watermarkHeight = $targetHeight - ($size);
+            $sizeAndPositionArray = array($size, 0, 28, $watermarkHeight);
     }
     return $sizeAndPositionArray;
 }
