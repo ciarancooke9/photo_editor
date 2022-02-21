@@ -35,32 +35,32 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
 }
 
 //this function handles form fields being incorrectly filled out
-function emptyFieldHandler($width, $height, $keepAspectRatio, $file){
+function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO refactor to return an array with not template code
     $replacementImage = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
-    $errorMessage = "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
+    $defaultErrorMessage = "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
     if (!$file){ //No file uploaded
-        echo $replacementImage;
         echo "<h2>File was not chosen</h2>";
         return false;
     } elseif ($width == '' && $height == ''){ //image & height missing
-        echo $replacementImage;
         echo $errorMessage;
         return false;
     } elseif ($width == '' && $keepAspectRatio == 'off') { //width missing without keep aspect ratio checked
-        echo $replacementImage;
         echo $errorMessage;
         return false;
     } elseif ($height == '' && $keepAspectRatio == 'off') { //height missing without keep aspect ratio checked
-        echo $replacementImage;
         echo $errorMessage;
         return false;
     } elseif ($width != '' && $height != '' && $keepAspectRatio == 'on') { //both height & width missing but aspect ration checked
-        echo $replacementImage;
-        echo "<h2>If you want to keep aspect ratio you must provide either height or width, not both</h2>";
+        $message = 'If you want to keep aspect ratio you must provide either height or width, not both';
+        $valid = false;
         return false;
     } else {
-        return true;
+        $message = null;
+        $valid = true;
     }
+
+    return ['valid_field_input' => $valid, 'message' => $message]; // TODO
+
 }
 
 ///function to check uploaded file extension, accepts a filename as a parameter
@@ -86,74 +86,74 @@ function checkFileExtension($fileName){
 
 // this file checks the inputs from the reshaped image form and gives back the reshaped image
 function imageHandler(){
-    print_r($_POST);
-    if($_POST) {
-
-        echo "<h1>{$_FILES['image']['name']}</h1>";
-
-        if(is_array($_FILES)) {
-            // check for keep aspect ratio and image quality inputs
-            if (isset($_POST['aspect'])){
-                $keepAspectRatio = 'on';
-            } else {
-                $keepAspectRatio = 'off';
-            }
-            //check for image quality parameter, keep 100% photo quality if not found
-            if (isset($_POST['imageQuality']) && ($_POST['imageQuality'] != '')){
-                $imageQuality = $_POST['imageQuality'];
-            } else {
-                $imageQuality = 100;
-            }
-
-            //check fields and file upload was not empty or missing data or too large
-            $fieldsNeeded = emptyFieldHandler($_POST['width'], $_POST['height'], $keepAspectRatio, $_FILES['image']['name']);
-            if(!$fieldsNeeded){
-                return;
-            } elseif ($_FILES['image']['size'] >= 2097152){
-                echo "<h1>File too large must be kept under 2MB</h1>";
-                return;
-            }
-
-
-            //extract image from FILES array and width, height and file type
-            $file = $_FILES['image']['tmp_name'];
-            $source_properties = getimagesize($file);
-
-            //check is file genuine image
-            if (!$source_properties){
-                echo "<h1>This file is not a genuine image</h1>";
-                return;
-            }
-            $image_type = $source_properties[2];
-
-            //Branch for JPG images
-            if( $image_type == IMAGETYPE_JPEG ) {
-                $image_resource_id = imagecreatefromjpeg($file);
-                $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1], $keepAspectRatio);
-                if (isset($_POST['watermark'])) {
-                    $target_layer = watermarkImage($target_layer);
-                }
-                imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality);
-                echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
-            }
-            // Branch for PNG images
-            elseif( $image_type == IMAGETYPE_PNG ) {
-                $image_resource_id = imagecreatefrompng($file);
-                $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
-                if (isset($_POST['watermark'])) {
-                    $target_layer = watermarkImage($target_layer);
-                }
-                imagejpeg($target_layer, $_FILES['image']['name'],$imageQuality);
-                echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
-                }
-
-            else{
-                echo "<h1>Please upload only jpeg or png files</h1>";
-            }
-        }
-    } else {
+    //Validating form has been submitted with file
+    if (!$_POST){
         echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+        return;
     }
+
+    if (!is_array($_FILES)){
+        echo "<h1>Please upload only jpeg or png files</h1>";
+        return;
+    }
+    //Ends Validation
+
+
+    echo "<h1>{$_FILES['image']['name']}</h1>";
+    // check for keep aspect ratio and image quality inputs
+    $keepAspectRatio = 'off';
+    if (isset($_POST['aspect'])){ // TODO Look at ternary operator
+        $keepAspectRatio = 'on';
+    }
+    //check for image quality parameter, keep 100% photo quality if not found
+
+    $imageQuality = 100;
+    if (isset($_POST['imageQuality']) && ($_POST['imageQuality'] != '')){
+        $imageQuality = $_POST['imageQuality'];
+    }
+// TODO: ternary operator:
+    //check fields and file upload was not empty or missing data or too large
+    $fieldsNeeded = emptyFieldHandler($_POST['width'], $_POST['height'], $keepAspectRatio, $_FILES['image']['name']);
+    if(!$fieldsNeeded){
+        return;
+    } elseif ($_FILES['image']['size'] >= 2097152){
+        echo "<h1>File too large must be kept under 2MB</h1>";
+        return;
+    }
+
+
+    //extract image from FILES array and width, height and file type
+    $file = $_FILES['image']['tmp_name'];
+    $source_properties = getimagesize($file);
+
+    //check is file genuine image
+    if (!$source_properties){
+        echo "<h1>This file is not a genuine image</h1>";
+        return;
+    }
+    $image_type = $source_properties[2];
+
+    //Branch for JPG images
+    if( $image_type == IMAGETYPE_JPEG ) {
+        $image_resource_id = imagecreatefromjpeg($file);
+        $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1], $keepAspectRatio);
+        if (!$_POST['watermark'] == '') {
+            $target_layer = watermarkImage($target_layer);
+        }
+        imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality);
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
+    }
+    // Branch for PNG images
+    elseif( $image_type == IMAGETYPE_PNG ) {
+        $image_resource_id = imagecreatefrompng($file);
+        $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
+        if (!$_POST['watermark'] == '') {
+            $target_layer = watermarkImage($target_layer);
+        }
+        imagejpeg($target_layer, $_FILES['image']['name'],$imageQuality);
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
+        }
+
 }
 
 //This function is passed the original image, its width and height and the keep aspect ratio option and gives back the resized image
