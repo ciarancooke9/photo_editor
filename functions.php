@@ -124,6 +124,7 @@ function imageHandler(){
 
     //extract image from FILES array and width, height and file type
     $file = $_FILES['image']['tmp_name'];
+    print_r($_FILES);//for debugging
     $source_properties = getimagesize($file);
 
     //check is file genuine image
