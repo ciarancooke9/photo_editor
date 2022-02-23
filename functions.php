@@ -141,7 +141,6 @@ function imageHandler(){
         if (!$_POST['watermark'] == '') {
             $target_layer = watermarkImage($target_layer);
         }
-        header('Content-Type: image/jpeg');
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
 
         echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
