@@ -10,8 +10,8 @@ function cleanInput($data) {
 
 ///this is a function to store a file, accepts filename, temporary filename and the destination directory
 /// it then returns the file location
-function storeFiles($fileName,$tempFileName, $fileDir){
-    $fileLocation = $fileDir . $fileName;
+function storeFiles($fileName, $tempFileName){
+    $fileLocation = 'images' . $fileName;
 
     move_uploaded_file($tempFileName, $fileLocation);
 
@@ -141,7 +141,8 @@ function imageHandler(){
         if (!$_POST['watermark'] == '') {
             $target_layer = watermarkImage($target_layer);
         }
-        imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality);
+        move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
+
         echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
     }
     // Branch for PNG images
