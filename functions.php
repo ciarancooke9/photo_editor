@@ -100,17 +100,12 @@ function imageHandler(){
 
 
     echo "<h1>{$_FILES['image']['name']}</h1>";
-    // check for keep aspect ratio and image quality inputs
-    $keepAspectRatio = 'off';
-    if (isset($_POST['aspect'])){ // TODO Look at ternary operator
-        $keepAspectRatio = 'on';
-    }
-    //check for image quality parameter, keep 100% photo quality if not found
+    // check for keep aspect ratio option
+    $keepAspectRatio = isset($_POST['aspect']) ? 'on' : 'off';
 
-    $imageQuality = 100;
-    if (isset($_POST['imageQuality']) && ($_POST['imageQuality'] != '')){
-        $imageQuality = $_POST['imageQuality'];
-    }
+    //check for image quality parameter, keep 100% photo quality if not found
+    $imageQuality = isset($_POST['imageQuality']) && ($_POST['imageQuality'] != '') ? $_POST['imageQuality'] : 100;
+
 // TODO: ternary operator:
     //check fields and file upload was not empty or missing data or too large
     $fieldsNeeded = emptyFieldHandler($_POST['width'], $_POST['height'], $keepAspectRatio, $_FILES['image']['name']);
