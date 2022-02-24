@@ -39,21 +39,20 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO re
     $replacementImage = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
     $defaultErrorMessage = "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
     if (!$file){ //No file uploaded
-        echo "<h2>File was not chosen</h2>";
-        return false;
+        $message = 'Please choose a file to upload!';
+        $valid = false;
     } elseif ($width == '' && $height == ''){ //image & height missing
-        echo $errorMessage;
-        return false;
+        $message = $defaultErrorMessage;
+        $valid = false;
     } elseif ($width == '' && $keepAspectRatio == 'off') { //width missing without keep aspect ratio checked
-        echo $errorMessage;
-        return false;
+        $message = $defaultErrorMessage;
+        $valid = false;
     } elseif ($height == '' && $keepAspectRatio == 'off') { //height missing without keep aspect ratio checked
-        echo $errorMessage;
-        return false;
+        $message = $defaultErrorMessage;
+        $valid = false;
     } elseif ($width != '' && $height != '' && $keepAspectRatio == 'on') { //both height & width missing but aspect ration checked
         $message = 'If you want to keep aspect ratio you must provide either height or width, not both';
         $valid = false;
-        return false;
     } else {
         $message = null;
         $valid = true;
@@ -109,7 +108,8 @@ function imageHandler(){
 // TODO: ternary operator:
     //check fields and file upload was not empty or missing data or too large
     $fieldsNeeded = emptyFieldHandler($_POST['width'], $_POST['height'], $keepAspectRatio, $_FILES['image']['name']);
-    if(!$fieldsNeeded){
+    if(!$fieldsNeeded['valid_field_input']){
+        echo $fieldsNeeded['message'];
         return;
     } elseif ($_FILES['image']['size'] >= 2097152){
         echo "<h1>File too large must be kept under 2MB</h1>";
@@ -119,9 +119,8 @@ function imageHandler(){
 
     //extract image from FILES array and width, height and file type
     $file = $_FILES['image']['tmp_name'];
-    print_r($_FILES);//for debugging h
-    $source_properties = getimagesize($file);
 
+    $source_properties = getimagesize($file);
     //check is file genuine image
     if (!$source_properties){
         echo "<h1>This file is not a genuine image</h1>";
@@ -133,9 +132,7 @@ function imageHandler(){
     if( $image_type == IMAGETYPE_JPEG ) {
         $image_resource_id = imagecreatefromjpeg($file);
         $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1], $keepAspectRatio);
-        if (!$_POST['watermark'] == '') {
-            $target_layer = watermarkImage($target_layer);
-        }
+        $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
 
         echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
@@ -144,11 +141,9 @@ function imageHandler(){
     elseif( $image_type == IMAGETYPE_PNG ) {
         $image_resource_id = imagecreatefrompng($file);
         $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
-        if (!$_POST['watermark'] == '') {
-            $target_layer = watermarkImage($target_layer);
-        }
-        imagejpeg($target_layer, $_FILES['image']['name'],$imageQuality);
-        echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='{$_FILES['image']['name']}' />";
+        $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
+        move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
         }
 
 }
