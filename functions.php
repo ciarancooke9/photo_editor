@@ -65,7 +65,7 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO re
 
 }
 
-// this funtion makes sure that the reshape image process $ form validation only begins once a form is being submitted
+// this funtion makes sure that the reshape image process $ form validation only begins once a form & image is being submitted
 function validateFormUpload(){
     if (!$_POST){
         $message = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
