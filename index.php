@@ -37,7 +37,7 @@
         echo "<h1>{$_FILES['image']['name']}</h1>";
     }
     $imageParameters = formHandler();
-    imageEditor($imageParameters['image'], $imageParameters['aspect_ratio'], $imageParameters['image_quality']);
+    imageEditor($imageParameters['image'], $imageParameters['aspect_ratio'], $imageParameters['image_quality'], $imageParameters['target_width'], $imageParameters['target_height'], $imageParameters['watermark']);
     ?>
     <!--<div class="col-lg-7">
         <br><br>

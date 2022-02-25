@@ -65,26 +65,6 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO re
 
 }
 
-///function to check uploaded file extension, accepts a filename as a parameter
-function checkFileExtension($fileName){
-    $src_file_name = $fileName;
-
-    $ext = strtolower(pathinfo($src_file_name, PATHINFO_EXTENSION));
-
-    if ($ext == 'jpg' || $ext == 'jpeg')
-    {
-        return true;
-    }
-
-    elseif ($ext == 'png')
-    {
-        return true;
-    }
-
-    else {
-        return false;
-    }
-}
 // this funtion makes sure that the reshape image process $ form validation only begins once a form is being submitted
 function validateFormUpload(){
     if (!$_POST){
@@ -116,7 +96,6 @@ function formHandler()
     //check for image quality parameter, keep 100% photo quality if not found
     $imageQuality = isset($_POST['imageQuality']) && ($_POST['imageQuality'] != '') ? $_POST['imageQuality'] : 100;
 
-// TODO: ternary operator:
     //check fields and file upload was not empty or missing data or too large
     $fieldsNeeded = emptyFieldHandler($_POST['width'], $_POST['height'], $keepAspectRatio, $_FILES['image']['name']);
 
@@ -136,17 +115,19 @@ function formHandler()
         return;
     }
 
-    return ['image' => $file, 'aspect_ratio' => $keepAspectRatio, 'image_quality' => $imageQuality ];
+    return ['image' => $file, 'aspect_ratio' => $keepAspectRatio, 'image_quality' => $imageQuality,
+        'target_width' => $_POST['width'], 'target_height' => $_POST['height'],
+        'watermark' => $_POST['watermark'], 'watermark_color' => $_POST['color'], 'watermark_position' => $_POST['position']];
 }
 
 
 //function which accepts an image
-function imageEditor($imageFile ,$keepAspectRatio, $imageQuality){
+function imageEditor($imageFile ,$keepAspectRatio, $imageQuality, $targetWidth, $targetHeight, $watermark){
     $sourceImageProperties = getimagesize($imageFile);
     if( $sourceImageProperties[2] == IMAGETYPE_JPEG ) {
         $image_resource_id = imagecreatefromjpeg($imageFile);
-        $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1], $keepAspectRatio);
-        $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
+        $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1], $keepAspectRatio, $targetWidth, $targetHeight);
+        $target_layer = $watermark ? watermarkImage($target_layer) : $target_layer;
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
 
         echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
@@ -154,7 +135,7 @@ function imageEditor($imageFile ,$keepAspectRatio, $imageQuality){
     // Branch for PNG images
     elseif( $sourceImageProperties[2] == IMAGETYPE_PNG ) {
         $image_resource_id = imagecreatefrompng($imageFile);
-        $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1],$keepAspectRatio);
+        $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1],$keepAspectRatio, $targetWidth, $targetHeight);
         $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
         echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}'/>";
@@ -163,10 +144,7 @@ function imageEditor($imageFile ,$keepAspectRatio, $imageQuality){
 }
 
 //This function is passed the original image, its width and height and the keep aspect ratio option and gives back the resized image
-function imageResize($image_resource_id,$width,$height,$keepAspectRatio) {
-    $targetWidth = $_POST['width'];
-    $targetHeight = $_POST['height'];
-
+function imageResize($image_resource_id,$width,$height,$keepAspectRatio, $targetWidth, $targetHeight) {
     // clean input
     $targetHeight = cleanInput($targetHeight);
     $targetWidth = cleanInput($targetWidth);
@@ -187,15 +165,16 @@ function imageResize($image_resource_id,$width,$height,$keepAspectRatio) {
 }
 //this function will add a watermark to the image
 function watermarkImage($image){
-    $text = $_POST['watermark'];
+    $watermarkParameters = formHandler();
+    $text = $watermarkParameters['watermark'];
     $text = cleanInput($text);
     $font = "C:\Windows\Fonts\arial.ttf"; //select font
 
     //assign watermark color
-    $fontColor = hexColorAllocate($image, $_POST['color']);
+    $fontColor = hexColorAllocate($image, $watermarkParameters['watermark_color']);
 
     //assign watermark position
-    $sizeAndPositionArray = watermarkPositionAndSize($_POST['width'], $_POST['height'], $_POST['position']);
+    $sizeAndPositionArray = watermarkPositionAndSize($watermarkParameters['target_width'], $watermarkParameters['target_width'], $watermarkParameters['watermark_position']);
     imagettftext($image, $sizeAndPositionArray[0], $sizeAndPositionArray[1],$sizeAndPositionArray[2], $sizeAndPositionArray[3], $fontColor, $font, $text); //choose watermark position
 
     return $image;
