@@ -168,7 +168,7 @@ function watermarkImage($image){
     $watermarkParameters = formHandler();
     $text = $watermarkParameters['watermark'];
     $text = cleanInput($text);
-    $font = "C:\Windows\Fonts\arial.ttf"; //select font
+    $font = "var/www/html/git/photo_editor/DejaVuSans.ttf"; //select font -- windows font file C:\Windows\Fonts\arial.ttf
 
     //assign watermark color
     $fontColor = hexColorAllocate($image, $watermarkParameters['watermark_color']);
