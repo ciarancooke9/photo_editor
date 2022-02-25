@@ -18,7 +18,7 @@ function storeFiles($fileName, $tempFileName){
     return $fileLocation;
 }
 
-///Function to maintain aspect ratio of an image, accepts target height and width and the original image height and width as paramaters
+///Function to maintain aspect ratio of an image, accepts target height and width and the original image height and width as parameters
 function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
     if (!$width == '')        //height missing, return new height
     {
@@ -32,6 +32,7 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
         $width = $factor * $oldWidth;
         return $width;
     }
+    return false;
 }
 
 //this function handles form fields being incorrectly filled out, it also checks for a valid file size
@@ -50,7 +51,7 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO re
     } elseif ($height == '' && !$keepAspectRatio) { //height missing without keep aspect ratio checked
         $message = $defaultErrorMessage;
         $valid = false;
-    } elseif ($width != '' && $height != '' && $keepAspectRatio) { //both height & width missing but aspect ration checked
+    } elseif ($width != '' && $height != '' && $keepAspectRatio) { //both height & width missing but aspect ratio checked
         $message = 'If you want to keep aspect ratio you must provide either height or width, not both';
         $valid = false;
     } elseif ($_FILES['image']['size'] >= 2097152){ ///image too large
@@ -65,7 +66,7 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO re
 
 }
 
-// this funtion makes sure that the reshape image process $ form validation only begins once a form & image is being submitted
+// this function makes sure the image reshaping process & form validation only begins once a form & image is being submitted
 function validateFormUpload(){
     if (!$_POST){
         $message = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
@@ -85,8 +86,7 @@ function formHandler()
     //Validating form has been submitted with file
     $validForm = validateFormUpload();
     if (!$validForm['validation']) {
-        echo $validForm['output'];
-        return;
+        return $validForm['output'];
     }
     //Ends Validation
 
@@ -100,8 +100,7 @@ function formHandler()
     $fieldsNeeded = emptyFieldHandler($_POST['width'], $_POST['height'], $keepAspectRatio, $_FILES['image']['name']);
 
     if (!$fieldsNeeded['valid_field_input']) {
-        echo $fieldsNeeded['message'];
-        return;
+        return $fieldsNeeded['message'];
     }
 
     //extract image from FILES array
@@ -111,8 +110,7 @@ function formHandler()
     $source_properties = getimagesize($file);
     //check is file genuine image
     if (!$source_properties) {
-        echo "<h1>This file is not a genuine image</h1>";
-        return;
+        return "<h1>This file is not a genuine image</h1>";
     }
 
     return ['image' => $file, 'aspect_ratio' => $keepAspectRatio, 'image_quality' => $imageQuality,
@@ -140,7 +138,6 @@ function imageEditor($imageFile ,$keepAspectRatio, $imageQuality, $targetWidth, 
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
         echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}'/>";
         }
-
 }
 
 //This function is passed the original image, its width and height and the keep aspect ratio option and gives back the resized image
@@ -165,7 +162,8 @@ function imageResize($image_resource_id,$width,$height,$keepAspectRatio, $target
 }
 //this function will add a watermark to the image
 function watermarkImage($image){
-    $watermarkParameters = formHandler();
+    $watermarkParameters = formHandler(); //get watermark form inputs
+
     $text = $watermarkParameters['watermark'];
     $text = cleanInput($text);
     $font = "var/www/html/git/photo_editor/DejaVuSans.ttf"; //select font -- windows font file C:\Windows\Fonts\arial.ttf
@@ -175,6 +173,7 @@ function watermarkImage($image){
 
     //assign watermark position
     $sizeAndPositionArray = watermarkPositionAndSize($watermarkParameters['target_width'], $watermarkParameters['target_height'], $watermarkParameters['watermark_position']);
+
     imagettftext($image, $sizeAndPositionArray[0], $sizeAndPositionArray[1],$sizeAndPositionArray[2], $sizeAndPositionArray[3], $fontColor, $font, $text); //choose watermark position
 
     return $image;
@@ -188,7 +187,6 @@ function watermarkPositionAndSize($targetWidth, $targetHeight, $position){
     $sizeAndPositionArray = array($size, 0, 28, 54);
     switch ($position){
         case "topLeft":
-            $sizeAndPositionArray = array($size, 0, 28, 54);
             break;
         case "topRight":
             $firstLetterPosition = $targetWidth - ($size * 7); //to keep watermark within borders of image
