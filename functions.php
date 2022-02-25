@@ -37,8 +37,8 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
 
 //this function handles form fields being incorrectly filled out, it also checks for a valid file size
 function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO refactor to return an array with not template code
-    $replacementImage = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
-    $defaultErrorMessage = "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
+    //$replacementImage = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+    $defaultErrorMessage = "Please fill out both fields or one with the keep aspect ratio box ticked";
     if (!$file){ //No file uploaded
         $message = 'Please choose a file to upload!';
         $valid = false;
@@ -68,13 +68,8 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO re
 
 // this function makes sure the image reshaping process & form validation only begins once a form & image is being submitted
 function validateFormUpload(){
-    if (!$_POST){
-        $message = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
-        return ['validation' => false, 'output' => $message];
-    }
-
     if (!is_array($_FILES)){
-        $message = "<h1>Please upload only jpeg or png files</h1>";
+        $message = "Please upload only jpeg or png files";
         return ['validation' => false, 'output' => $message];
     }
     return ['validation' => true, 'output' => ''];
@@ -110,7 +105,7 @@ function formHandler()
     $source_properties = getimagesize($file);
     //check is file genuine image
     if (!$source_properties) {
-        return "<h1>This file is not a genuine image</h1>";
+        return "This file is not a genuine image";
     }
 
     return ['image' => $file, 'aspect_ratio' => $keepAspectRatio, 'image_quality' => $imageQuality,
