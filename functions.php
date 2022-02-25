@@ -85,7 +85,7 @@ function checkFileExtension($fileName){
         return false;
     }
 }
-
+// this funtion makes sure that the reshape image process $ form validation only begins once a form is being submitted
 function validateFormUpload(){
     if (!$_POST){
         $message = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
@@ -99,12 +99,14 @@ function validateFormUpload(){
     return ['validation' => true, 'output' => ''];
 }
 
-// this file checks the inputs from the reshaped image form and gives back the reshaped image
-function imageHandler(){
+// this file checks the inputs from form, validates them and returns an array with the attributes needed to reshape the image
+function formHandler()
+{
     //Validating form has been submitted with file
     $validForm = validateFormUpload();
-    if (!$validForm['validation']){
-        return $validForm['output'];
+    if (!$validForm['validation']) {
+        echo $validForm['output'];
+        return;
     }
     //Ends Validation
 
@@ -118,7 +120,7 @@ function imageHandler(){
     //check fields and file upload was not empty or missing data or too large
     $fieldsNeeded = emptyFieldHandler($_POST['width'], $_POST['height'], $keepAspectRatio, $_FILES['image']['name']);
 
-    if(!$fieldsNeeded['valid_field_input']){
+    if (!$fieldsNeeded['valid_field_input']) {
         echo $fieldsNeeded['message'];
         return;
     }
@@ -129,26 +131,30 @@ function imageHandler(){
     //$source properties array = width, height and file type
     $source_properties = getimagesize($file);
     //check is file genuine image
-    if (!$source_properties){
+    if (!$source_properties) {
         echo "<h1>This file is not a genuine image</h1>";
         return;
     }
-    $image_type = $source_properties[2];
-    //////////////////////////////////////////////////////
+
+    return ['image' => $file, 'aspect_ratio' => $keepAspectRatio, 'image_quality' => $imageQuality ];
+}
+
     //jpeg and png branches
     //Branch for JPG images
-    if( $image_type == IMAGETYPE_JPEG ) {
-        $image_resource_id = imagecreatefromjpeg($file);
-        $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1], $keepAspectRatio);
+function imageEditor($imageFile ,$keepAspectRatio, $imageQuality){
+    $sourceImageProperties = getimagesize($imageFile);
+    if( $sourceImageProperties[2] == IMAGETYPE_JPEG ) {
+        $image_resource_id = imagecreatefromjpeg($imageFile);
+        $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1], $keepAspectRatio);
         $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
 
         echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
     }
     // Branch for PNG images
-    elseif( $image_type == IMAGETYPE_PNG ) {
-        $image_resource_id = imagecreatefrompng($file);
-        $target_layer = imageResize($image_resource_id, $source_properties[0], $source_properties[1],$keepAspectRatio);
+    elseif( $sourceImageProperties[2] == IMAGETYPE_PNG ) {
+        $image_resource_id = imagecreatefrompng($imageFile);
+        $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1],$keepAspectRatio);
         $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
         echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";

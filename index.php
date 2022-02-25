@@ -36,7 +36,8 @@
     if ($_POST){
         echo "<h1>{$_FILES['image']['name']}</h1>";
     }
-    imageHandler();
+    $imageParameters = formHandler();
+    imageEditor($imageParameters['image'], $imageParameters['aspect_ratio'], $imageParameters['image_quality']);
     ?>
     <!--<div class="col-lg-7">
         <br><br>
