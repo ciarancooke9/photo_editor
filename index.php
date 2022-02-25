@@ -33,6 +33,9 @@
 <div class="container px-4 px-lg-5">
     <!-- Heading Row-->
     <?php
+    if ($_POST){
+        echo "<h1>{$_FILES['image']['name']}</h1>";
+    }
     imageHandler();
     ?>
     <!--<div class="col-lg-7">

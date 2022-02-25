@@ -34,7 +34,7 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
     }
 }
 
-//this function handles form fields being incorrectly filled out
+//this function handles form fields being incorrectly filled out, it also checks for a valid file size
 function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO refactor to return an array with not template code
     $replacementImage = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
     $defaultErrorMessage = "<h2>Please fill out both fields or one with the keep aspect ratio box ticked</h2>";
@@ -52,6 +52,9 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO re
         $valid = false;
     } elseif ($width != '' && $height != '' && $keepAspectRatio == 'on') { //both height & width missing but aspect ration checked
         $message = 'If you want to keep aspect ratio you must provide either height or width, not both';
+        $valid = false;
+    } elseif ($_FILES['image']['size'] >= 2097152){ ///image too large
+        $message = "File too large must be kept under 2MB";
         $valid = false;
     } else {
         $message = null;
@@ -83,24 +86,30 @@ function checkFileExtension($fileName){
     }
 }
 
-// this file checks the inputs from the reshaped image form and gives back the reshaped image
-function imageHandler(){
-    //Validating form has been submitted with file
+function validateFormUpload(){
     if (!$_POST){
-        echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
-        return;
+        $message = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+        return ['validation' => false, 'output' => $message];
     }
 
     if (!is_array($_FILES)){
-        echo "<h1>Please upload only jpeg or png files</h1>";
-        return;
+        $message = "<h1>Please upload only jpeg or png files</h1>";
+        return ['validation' => false, 'output' => $message];
+    }
+    return ['validation' => true, 'output' => ''];
+}
+
+// this file checks the inputs from the reshaped image form and gives back the reshaped image
+function imageHandler(){
+    //Validating form has been submitted with file
+    $validForm = validateFormUpload();
+    if (!$validForm['validation']){
+        return $validForm['output'];
     }
     //Ends Validation
 
-
-    echo "<h1>{$_FILES['image']['name']}</h1>";
     // check for keep aspect ratio option
-    $keepAspectRatio = isset($_POST['aspect']) ? 'on' : 'off';
+    $keepAspectRatio = isset($_POST['aspect']);
 
     //check for image quality parameter, keep 100% photo quality if not found
     $imageQuality = isset($_POST['imageQuality']) && ($_POST['imageQuality'] != '') ? $_POST['imageQuality'] : 100;
@@ -108,18 +117,16 @@ function imageHandler(){
 // TODO: ternary operator:
     //check fields and file upload was not empty or missing data or too large
     $fieldsNeeded = emptyFieldHandler($_POST['width'], $_POST['height'], $keepAspectRatio, $_FILES['image']['name']);
+
     if(!$fieldsNeeded['valid_field_input']){
         echo $fieldsNeeded['message'];
         return;
-    } elseif ($_FILES['image']['size'] >= 2097152){
-        echo "<h1>File too large must be kept under 2MB</h1>";
-        return;
     }
 
-
-    //extract image from FILES array and width, height and file type
+    //extract image from FILES array
     $file = $_FILES['image']['tmp_name'];
 
+    //$source properties array = width, height and file type
     $source_properties = getimagesize($file);
     //check is file genuine image
     if (!$source_properties){
@@ -127,7 +134,8 @@ function imageHandler(){
         return;
     }
     $image_type = $source_properties[2];
-
+    //////////////////////////////////////////////////////
+    //jpeg and png branches
     //Branch for JPG images
     if( $image_type == IMAGETYPE_JPEG ) {
         $image_resource_id = imagecreatefromjpeg($file);
@@ -159,7 +167,7 @@ function imageResize($image_resource_id,$width,$height,$keepAspectRatio) {
 
     echo "<h2>Height:$targetHeight</h2>". ' ' . "<h2>Width:$targetWidth</h2>";
 
-    //perform keep aspect ratio function if selceted
+    //perform keep aspect ratio function if selected
     if ($keepAspectRatio == 'on' && $targetWidth != ''){
         $targetHeight = keepAspectRatio($targetWidth, $targetHeight, $width, $height);
     } elseif ($keepAspectRatio == 'on' && $targetHeight != ''){
@@ -192,6 +200,7 @@ function watermarkPositionAndSize($targetWidth, $targetHeight, $position){
 
     //switch statement to handle different options
     $size = ($targetWidth + $targetHeight) / 100; //statement to keep image size consistent with different image sizes and shapes
+    $sizeAndPositionArray = array($size, 0, 28, 54);
     switch ($position){
         case "topLeft":
             $sizeAndPositionArray = array($size, 0, 28, 54);
@@ -227,9 +236,9 @@ function watermarkPositionAndSize($targetWidth, $targetHeight, $position){
 //Returns a color identifier representing the color composed of the given RGB components.
 function hexColorAllocate($image,$hex){
     $hex = ltrim($hex,'#');
-    $r = hexdec(substr($hex,0,2));
-    $g = hexdec(substr($hex,2,2));
-    $b = hexdec(substr($hex,4,2));
-    return imagecolorallocatealpha($image, $r, $g, $b, 75);
+    $red = hexdec(substr($hex,0,2));
+    $green = hexdec(substr($hex,2,2));
+    $blue = hexdec(substr($hex,4,2));
+    return imagecolorallocatealpha($image, $red, $green, $blue, 75);
 }
 ?>
