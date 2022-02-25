@@ -111,7 +111,7 @@ function formHandler()
     //Ends Validation
 
     // check for keep aspect ratio option
-    $keepAspectRatio = isset($_POST['aspect']);
+    $keepAspectRatio = isset($_POST['aspect']) ? 'on': '';
 
     //check for image quality parameter, keep 100% photo quality if not found
     $imageQuality = isset($_POST['imageQuality']) && ($_POST['imageQuality'] != '') ? $_POST['imageQuality'] : 100;
@@ -139,8 +139,8 @@ function formHandler()
     return ['image' => $file, 'aspect_ratio' => $keepAspectRatio, 'image_quality' => $imageQuality ];
 }
 
-    //jpeg and png branches
-    //Branch for JPG images
+
+//function which accepts an image
 function imageEditor($imageFile ,$keepAspectRatio, $imageQuality){
     $sourceImageProperties = getimagesize($imageFile);
     if( $sourceImageProperties[2] == IMAGETYPE_JPEG ) {
@@ -157,7 +157,7 @@ function imageEditor($imageFile ,$keepAspectRatio, $imageQuality){
         $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1],$keepAspectRatio);
         $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
-        echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}'/>";
         }
 
 }
