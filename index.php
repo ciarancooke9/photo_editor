@@ -36,9 +36,11 @@
     if ($_POST){
         echo "<h1>{$_FILES['image']['name']}</h1>";
         $imageParameters = formHandler();
-        imageEditor($imageParameters['image'], $imageParameters['aspect_ratio'], $imageParameters['image_quality'], $imageParameters['target_width'], $imageParameters['target_height'], $imageParameters['watermark']);
+        imageEditor($imageParameters['image'], $imageParameters['aspect_ratio'], $imageParameters['image_quality'], $imageParameters['target_width'], $imageParameters['target_height']);
+    } else{
+        echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
     }
-    echo "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
+
     ?>
     <!--<div class="col-lg-7">
         <br><br>

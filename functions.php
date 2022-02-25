@@ -122,12 +122,12 @@ function formHandler()
 
 
 //function which accepts an image
-function imageEditor($imageFile ,$keepAspectRatio, $imageQuality, $targetWidth, $targetHeight, $watermark){
+function imageEditor($imageFile ,$keepAspectRatio, $imageQuality, $targetWidth, $targetHeight){
     $sourceImageProperties = getimagesize($imageFile);
     if( $sourceImageProperties[2] == IMAGETYPE_JPEG ) {
         $image_resource_id = imagecreatefromjpeg($imageFile);
         $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1], $keepAspectRatio, $targetWidth, $targetHeight);
-        $target_layer = $watermark ? watermarkImage($target_layer) : $target_layer;
+        $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
 
         echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
@@ -174,7 +174,7 @@ function watermarkImage($image){
     $fontColor = hexColorAllocate($image, $watermarkParameters['watermark_color']);
 
     //assign watermark position
-    $sizeAndPositionArray = watermarkPositionAndSize($watermarkParameters['target_width'], $watermarkParameters['target_width'], $watermarkParameters['watermark_position']);
+    $sizeAndPositionArray = watermarkPositionAndSize($watermarkParameters['target_width'], $watermarkParameters['target_height'], $watermarkParameters['watermark_position']);
     imagettftext($image, $sizeAndPositionArray[0], $sizeAndPositionArray[1],$sizeAndPositionArray[2], $sizeAndPositionArray[3], $fontColor, $font, $text); //choose watermark position
 
     return $image;
