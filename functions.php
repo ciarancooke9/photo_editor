@@ -62,7 +62,7 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO re
         $valid = true;
     }
 
-    return ['valid_field_input' => $valid, 'message' => $message]; // TODO
+    return ['valid_field_input' => $valid, 'message' => $message];
 
 }
 
