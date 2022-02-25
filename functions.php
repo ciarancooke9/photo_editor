@@ -20,13 +20,13 @@ function storeFiles($fileName, $tempFileName){
 
 ///Function to maintain aspect ratio of an image, accepts target height and width and the original image height and width as paramaters
 function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
-    if (!$width == '')        //height missing
+    if (!$width == '')        //height missing, return new height
     {
         $factor = (float)$width / (float)$oldWidth;
         $height = $factor * $oldHeight;
         return $height;
     }
-    else if (!$height == '')      //width missing
+    else if (!$height == '')      //width missing, return new width
     {
         $factor = (float)$height / (float)$oldHeight;
         $width = $factor * $oldWidth;
@@ -111,7 +111,7 @@ function formHandler()
     //Ends Validation
 
     // check for keep aspect ratio option
-    $keepAspectRatio = isset($_POST['aspect']) ? 'on': '';
+    $keepAspectRatio = isset($_POST['aspect']);
 
     //check for image quality parameter, keep 100% photo quality if not found
     $imageQuality = isset($_POST['imageQuality']) && ($_POST['imageQuality'] != '') ? $_POST['imageQuality'] : 100;
@@ -174,9 +174,9 @@ function imageResize($image_resource_id,$width,$height,$keepAspectRatio) {
     echo "<h2>Height:$targetHeight</h2>". ' ' . "<h2>Width:$targetWidth</h2>";
 
     //perform keep aspect ratio function if selected
-    if ($keepAspectRatio == 'on' && $targetWidth != ''){
+    if ($keepAspectRatio && $targetWidth != ''){
         $targetHeight = keepAspectRatio($targetWidth, $targetHeight, $width, $height);
-    } elseif ($keepAspectRatio == 'on' && $targetHeight != ''){
+    } elseif ($keepAspectRatio && $targetHeight != ''){
         $targetWidth = keepAspectRatio($targetWidth, $targetHeight, $width, $height);
     }
 
