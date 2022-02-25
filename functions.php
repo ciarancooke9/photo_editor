@@ -44,13 +44,13 @@ function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO re
     } elseif ($width == '' && $height == ''){ //image & height missing
         $message = $defaultErrorMessage;
         $valid = false;
-    } elseif ($width == '' && $keepAspectRatio == 'off') { //width missing without keep aspect ratio checked
+    } elseif ($width == '' && !$keepAspectRatio) { //width missing without keep aspect ratio checked
         $message = $defaultErrorMessage;
         $valid = false;
-    } elseif ($height == '' && $keepAspectRatio == 'off') { //height missing without keep aspect ratio checked
+    } elseif ($height == '' && !$keepAspectRatio) { //height missing without keep aspect ratio checked
         $message = $defaultErrorMessage;
         $valid = false;
-    } elseif ($width != '' && $height != '' && $keepAspectRatio == 'on') { //both height & width missing but aspect ration checked
+    } elseif ($width != '' && $height != '' && $keepAspectRatio) { //both height & width missing but aspect ration checked
         $message = 'If you want to keep aspect ratio you must provide either height or width, not both';
         $valid = false;
     } elseif ($_FILES['image']['size'] >= 2097152){ ///image too large
