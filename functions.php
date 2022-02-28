@@ -36,9 +36,9 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
 }
 
 //this function handles form fields being incorrectly filled out, it also checks for a valid file size
-function emptyFieldHandler($width, $height, $keepAspectRatio, $file){ // TODO refactor to return an array with not template code
-    //$replacementImage = "<img class='img-fluid rounded mb-4 mb-lg-0' src='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' width='750' height='600' alt='...' />";
-    $defaultErrorMessage = "Please fill out both fields or one with the keep aspect ratio box ticked";
+function emptyFieldHandler($width, $height, $keepAspectRatio, $file){
+
+    $defaultErrorMessage = "Please fill out both width & height or only one with the keep aspect ratio box ticked";
     if (!$file){ //No file uploaded
         $message = 'Please choose a file to upload!';
         $valid = false;
@@ -137,8 +137,6 @@ function imageResize($image_resource_id,$width,$height,$keepAspectRatio, $target
     // clean input
     $targetHeight = cleanInput($targetHeight);
     $targetWidth = cleanInput($targetWidth);
-
-    echo "<h2>Height:$targetHeight</h2>". ' ' . "<h2>Width:$targetWidth</h2>";
 
     //perform keep aspect ratio function if selected
     if ($keepAspectRatio && $targetWidth != ''){
