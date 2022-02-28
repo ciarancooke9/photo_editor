@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Small Business - Start Bootstrap Template</title>
+    <title>JPG & PNG Editor</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href='https://support.apple.com/library/content/dam/edam/applecare/images/en_US/social/supportapphero/camera-modes-hero.jpg' />
     <!-- Core theme CSS (includes Bootstrap)-->
