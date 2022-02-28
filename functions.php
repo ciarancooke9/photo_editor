@@ -95,7 +95,7 @@ function formHandler()
     $fieldsNeeded = emptyFieldHandler($_POST['width'], $_POST['height'], $keepAspectRatio, $_FILES['image']['name']);
 
     if (!$fieldsNeeded['valid_field_input']) {
-        return $fieldsNeeded['message'];
+       return ['form_success' => false ,'message' => $fieldsNeeded['message']];
     }
 
     //extract image from FILES array
@@ -105,16 +105,16 @@ function formHandler()
     $source_properties = getimagesize($file);
     //check is file genuine image
     if (!$source_properties) {
-        return "This file is not a genuine image";
+        return ['form_success' => false ,'message' => 'This file is not a genuine image'];
     }
 
-    return ['image' => $file, 'aspect_ratio' => $keepAspectRatio, 'image_quality' => $imageQuality,
+    return ['form_success' => true ,'message' => '','image' => $file, 'aspect_ratio' => $keepAspectRatio, 'image_quality' => $imageQuality,
         'target_width' => $_POST['width'], 'target_height' => $_POST['height'],
         'watermark' => $_POST['watermark'], 'watermark_color' => $_POST['color'], 'watermark_position' => $_POST['position']];
 }
 
 
-//function which accepts an image
+//function which accepts an image , sends it to the imageResize function and watermark function if selected, saving it to the 'images' folder
 function imageEditor($imageFile ,$keepAspectRatio, $imageQuality, $targetWidth, $targetHeight){
     $sourceImageProperties = getimagesize($imageFile);
     if( $sourceImageProperties[2] == IMAGETYPE_JPEG ) {
@@ -122,16 +122,13 @@ function imageEditor($imageFile ,$keepAspectRatio, $imageQuality, $targetWidth, 
         $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1], $keepAspectRatio, $targetWidth, $targetHeight);
         $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
-
-        echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}' />";
-    }
+        }
     // Branch for PNG images
     elseif( $sourceImageProperties[2] == IMAGETYPE_PNG ) {
         $image_resource_id = imagecreatefrompng($imageFile);
         $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1],$keepAspectRatio, $targetWidth, $targetHeight);
         $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
         move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
-        echo "<img class='img-fluid rounded mb-4 mb-lg-0'  src='images/{$_FILES['image']['name']}'/>";
         }
 }
 
