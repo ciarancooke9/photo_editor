@@ -23,14 +23,12 @@ function keepAspectRatio($width, $height, $oldWidth, $oldHeight){
     if (!$width == '')        //height missing, return new height
     {
         $factor = (float)$width / (float)$oldWidth;
-        $height = $factor * $oldHeight;
-        return $height;
+        return $factor * $oldHeight;
     }
     else if (!$height == '')      //width missing, return new width
     {
         $factor = (float)$height / (float)$oldHeight;
-        $width = $factor * $oldWidth;
-        return $width;
+        return $factor * $oldWidth;
     }
     return false;
 }
@@ -150,7 +148,7 @@ function imageResize($image_resource_id,$width,$height,$keepAspectRatio, $target
     imagecopyresampled($target_layer,$image_resource_id,0,0,0,0,$targetWidth,$targetHeight, $width,$height);
     return $target_layer;
 }
-//this function will add a watermark to the image
+//this function will add a watermark to the image received as a parameter and will return the watermarked image
 function watermarkImage($image){
     $watermarkParameters = formHandler(); //get watermark form inputs
 
