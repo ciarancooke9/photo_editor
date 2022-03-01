@@ -3,9 +3,7 @@
 function cleanInput($data) {
     $data = trim($data);
     $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-
-    return $data;
+    return htmlspecialchars($data);
 }
 
 ///this is a function to store a file, accepts filename, temporary filename and the destination directory
@@ -114,19 +112,25 @@ function formHandler()
 
 //function which accepts an image , sends it to the imageResize function and watermark function if selected, saving it to the 'images' folder
 function imageEditor($imageFile ,$keepAspectRatio, $imageQuality, $targetWidth, $targetHeight){
-    $sourceImageProperties = getimagesize($imageFile);
+    $sourceImageProperties = getimagesize($imageFile); //array with source image type, height & width
+    //Jpeg Branch
     if( $sourceImageProperties[2] == IMAGETYPE_JPEG ) {
-        $image_resource_id = imagecreatefromjpeg($imageFile);
-        $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1], $keepAspectRatio, $targetWidth, $targetHeight);
-        $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
-        move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
+
+        $target_layer = imageResize(imagecreatefromjpeg($imageFile), $sourceImageProperties[0], $sourceImageProperties[1], $keepAspectRatio, $targetWidth, $targetHeight); //reshape image
+
+        $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer; //watermark image if watermark text field is not empty
+
+        move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']); //save edited image to images/ folder
         }
+
     // Branch for PNG images
     elseif( $sourceImageProperties[2] == IMAGETYPE_PNG ) {
-        $image_resource_id = imagecreatefrompng($imageFile);
-        $target_layer = imageResize($image_resource_id, $sourceImageProperties[0], $sourceImageProperties[1],$keepAspectRatio, $targetWidth, $targetHeight);
-        $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer;
-        move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']);
+
+        $target_layer = imageResize(imagecreatefrompng($imageFile), $sourceImageProperties[0], $sourceImageProperties[1],$keepAspectRatio, $targetWidth, $targetHeight); //reshape image
+
+        $target_layer = !$_POST['watermark'] == '' ? watermarkImage($target_layer) : $target_layer; //watermark image if watermark text field is not empty
+
+        move_uploaded_file(imagejpeg($target_layer, 'images/' . $_FILES['image']['name'], $imageQuality), 'images/' . $_FILES['image']['name']); //save edited image to images/ folder
         }
 }
 
@@ -136,17 +140,16 @@ function imageResize($image_resource_id,$width,$height,$keepAspectRatio, $target
     $targetHeight = cleanInput($targetHeight);
     $targetWidth = cleanInput($targetWidth);
 
-    //perform keep aspect ratio function if selected
+    //perform keep aspect ratio function if selected, replacing empty parameter
     if ($keepAspectRatio && $targetWidth != ''){
         $targetHeight = keepAspectRatio($targetWidth, $targetHeight, $width, $height);
     } elseif ($keepAspectRatio && $targetHeight != ''){
         $targetWidth = keepAspectRatio($targetWidth, $targetHeight, $width, $height);
     }
 
-    //create resized image and paint old image over it
-    $target_layer=imagecreatetruecolor($targetWidth,$targetHeight);
-    imagecopyresampled($target_layer,$image_resource_id,0,0,0,0,$targetWidth,$targetHeight, $width,$height);
-    return $target_layer;
+    $target_layer=imagecreatetruecolor($targetWidth,$targetHeight); //create resized image
+    imagecopyresampled($target_layer,$image_resource_id,0,0,0,0,$targetWidth,$targetHeight, $width,$height); // paint old image over it
+    return $target_layer; // return new resized image
 }
 //this function will add a watermark to the image received as a parameter and will return the watermarked image
 function watermarkImage($image){
@@ -212,4 +215,3 @@ function hexColorAllocate($image,$hex){
     $blue = hexdec(substr($hex,4,2));
     return imagecolorallocatealpha($image, $red, $green, $blue, 75);
 }
-?>
